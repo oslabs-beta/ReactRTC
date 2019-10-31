@@ -13,6 +13,10 @@ socketConnection.onopen = () => {
   console.log('socket connection opened!')
 }
 
+/**
+ * @Step - SIX -
+ * @Part (A) 
+ */
 socketConnection.onmessage = async ({ data }) => {
   console.log('receiving data from signaling server aka WebSockets')
   const parsedData = JSON.parse(data);

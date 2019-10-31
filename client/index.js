@@ -1,12 +1,49 @@
 const localVideo = document.querySelector('#localVideo');
+const remoteVideo = document.querySelector('#remoteVideo');
 const startButton = document.querySelector('#start');
 const stopButton = document.querySelector('#stop');
 const callButton = document.querySelector('#call');
 const socketConnection = new WebSocket('wss://localhost:3000');
-
+const sessionConstraints = {video: true, audio: false};
+// object with key iceServers that contains an array of URL objects to each STUN server
+const iceServerConfig = {iceServers: [{urls: 'stun:stun.l.google.com:19302'}]};
+// create a local peerConnection utilizing stun servers
+const peerConnection = new RTCPeerConnection(iceServerConfig);
 socketConnection.onopen = () => {
   console.log('socket connection opened!')
 }
+
+socketConnection.onmessage = async ({ data }) => {
+  console.log('receiving data from signaling server aka WebSockets')
+  const parsedData = JSON.parse(data);
+  try {
+    // ? REFACTOR AS SWITCH CASE
+    if (data) {
+      if (parsedData.type === 'offer') {
+        console.log('Offer has been recieved')
+        await peerConnection.setRemoteDescription(parsedData);
+        const localUserStream = await navigator.mediaDevices.getUserMedia(sessionConstraints)
+        localUserStream.getTracks().forEach((track) => {
+          peerConnection.addTrack(track, localUserStream);
+        });
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+        socketConnection.send(JSON.stringify(peerConnection.localDescription));
+      } else if (parsedData.type === 'answer') {
+        console.log('Answer has been recieved')
+        await peerConnection.setRemoteDescription(parsedData);
+      } else {
+        console.error('Unsupported SDP type');
+      }
+    }
+    if (parsedData.type === 'icecandidate') {
+      await peerConnection.addIceCandidate(parsedData.candidate);
+    }
+    // * add else if statement for iceCandidate
+  } catch(err) {
+    console.error("ERROR: ", err);
+  }
+};
 
 let localStream = null;
 // ______________________________ LOCALSTREAM ______________________________
@@ -20,7 +57,7 @@ function handleUserMedia(mediaStream) {
 }
 
 startButton.addEventListener('click', function(event) {
-  navigator.mediaDevices.getUserMedia( {video: true, audio: false} )
+  navigator.mediaDevices.getUserMedia(sessionConstraints)
     .then(handleUserMedia)
     .catch((err) => {
       console.log(err)
@@ -41,15 +78,13 @@ stopButton.addEventListener('click', (event) => {
  * them to do anything involving streamed media with WebRTC.
  */
 callButton.addEventListener('click', async (event) => {
-  // object with key iceServers that contains an array of URL objects to each STUN server
-  const iceServerConfig = {iceServers: [{urls: 'stun:stun.l.google.com:19302'}]};
-  // create a local peerConnection utilizing stun servers
-  const peerConnection = new RTCPeerConnection(iceServerConfig);
-  
   // Since ICE doesn't know about your signaling server, your code handles 
   // transmission of each candidate in your onIceHandler for the icecandidate event.
   peerConnection.onicecandidate = onIceHandler;
+  // ? pc.ontrack only listens for tracks coming from remote peer (not local)
+  // https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/track_event
   peerConnection.ontrack = onTrackHandler;
+  // Its job is to create and send an offer, to the callee, asking it to connect with us
   peerConnection.onnegotiationneeded = onNegotiationNeededHandler;
   /**
    * @Step - THREE -
@@ -70,31 +105,12 @@ callButton.addEventListener('click', async (event) => {
     // change to the communication environment requires reconfiguring the connection.
     peerConnection.addTrack(mediaStreamTrack);
   });
-
-  /**
-   * @Step - FOUR -
-   * @Part (A) create a offer and save it to the PeerConnections LOCALDESCRIPTION property
-   * 
-   * @Note Once setLocalDescription()'s fulfillment handler has run, the ICE agent begins 
-   * sending icecandidate events to the RTCPeerConnection, one for each potential 
-   * configuration it discovers.
-   */
-  let offer;
-  try {
-    // returns a RTCSessionDescription Object with a TYPE & SDP property
-    offer = await peerConnection.createOffer();
-    // ! does not work with IE
-    // * is Promised-based with Chrome (Android & Desktop) v51 | Opera (Android & Desktop) v43 | Android Webview v51 | Samsung Internet
-    peerConnection.setLocalDescription(offer);
-    // after setLocalDescription has been fulfilled, an "icecandidate event" is sent to the RTCPeerConnection
-  } catch(err) {
-    console.log("ERROR: ", err);
-  }
-  // debugger;
 });
 // _________________________________ CALLBUTTON END __________________________________________ //
 
 /**
+ * @Step - FIVE -
+ * @Part (A) recieves RTCPeerConnectionIceEvent after STEP 4 has been completed
  * 
  * @param {*} RTCPeerConnectionIceEvent represents the icecandidate event
  * @Note if you need to sense the end of signaling, you should watch for a icegatheringstatechange 
@@ -103,16 +119,46 @@ callButton.addEventListener('click', async (event) => {
  * until it runs out of suggestions, even if media has already started streaming.
  */
 const onIceHandler = (RTCPeerConnectionIceEvent) => {
-  debugger
   // If the event's candidate property is null, ICE gathering has finished
   if (RTCPeerConnectionIceEvent.candidate) {
     // Send the candidate to the remote peer
+    const { type, candidate } = RTCPeerConnectionIceEvent;
+    socketConnection.send(JSON.stringify({ type, candidate }));
   }
 };
-const onTrackHandler = (event) => {
-  // TODO ------------------------> THIS IS WHERE YOU LEFT OFF FROM <-----------------------------------------------------
-  // TODO ----------------------------------------------------------------------------------------------------------------
-};
-const onNegotiationNeededHandler = (event) => {
 
+/**
+ * 
+ * @param {*} e 
+ * @Note The track event is sent to the ontrack event handler on RTCPeerConnections after a new 
+ * track has been added to an RTCRtpReceiver which is part of the connection.
+ */
+const onTrackHandler = (e) => {
+  debugger
+  if (remoteVideo.srcObject) return;
+  remoteVideo.srcObject = e.streams[0];
+};
+const onNegotiationNeededHandler = async (negotiationNeededEvent) => {
+  /**
+   * @Step - FOUR -
+   * @Part (A) create a offer and save it to the PeerConnections LOCALDESCRIPTION property
+   * @Part (B) send the localDescription to remote peer
+   * 
+   * @Note Once setLocalDescription()'s fulfillment handler has run, the ICE agent begins 
+   * sending icecandidate events to the RTCPeerConnection, one for each potential 
+   * configuration it discovers.
+   */
+  try {
+    // returns a RTCSessionDescription Object with a TYPE & SDP property
+    const offer = await peerConnection.createOffer();
+    // ! does not work with IE
+    // * is Promised-based with Chrome (Android & Desktop) v51 | Opera (Android & Desktop) v43 | Android Webview v51 | Samsung Internet
+    await peerConnection.setLocalDescription(offer);
+    // after setLocalDescription has been fulfilled, an "icecandidate event" is sent to the RTCPeerConnection
+    console.log('About to send data')
+    // (B) send localDescription to remote peer
+    socketConnection.send(JSON.stringify(peerConnection.localDescription));
+  } catch(err) {
+    console.log("ERROR: ", err);
+  }
 };

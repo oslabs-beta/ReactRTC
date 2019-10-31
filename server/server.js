@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const https = require('https');
-const app = express();
+const app = express(); 
 const WebSocket = require('ws');
 // const test = path.resolve(__dirname, '../client/index.js')
 const PORT = 3000;
@@ -22,9 +22,14 @@ const server = https.createServer({
 // WEBSOCKET SECURED CONNECTION //
 const wss = new WebSocket.Server({server});
 
-wss.on('connection', (that, socket, req) => {
-  console.log("THAT: ", that, "\nSOCKET: ", socket, "\nREQ: ", req);
-})
+wss.on('connection', (websocket, incomingMessage, req) => {
+  websocket.on('message', (data) => {
+    console.log('\nINSIDE SERVER VIDEO OFFER')
+    console.log('\nDATA: ', data)
+    websocket.send(data)
+  });
+});
+
 // ____________________________ //
 
 server.listen(PORT, () => {

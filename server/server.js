@@ -6,6 +6,7 @@ const app = express();
 const WebSocket = require('ws');
 // const test = path.resolve(__dirname, '../client/index.js')
 const PORT = 3000;
+let count = 0;
 
 app.get('/index.js', (req, res) => res.sendFile(path.resolve(__dirname, '../client/index.js')));
 app.get('/', (req,res) => {
@@ -23,6 +24,7 @@ const server = https.createServer({
 const wss = new WebSocket.Server({server});
 
 wss.on('connection', (websocket, incomingMessage, req) => {
+  websocket.send(JSON.stringify({userID: ++count}));
   websocket.on('message', (data) => {
     console.log('\nINSIDE SERVER VIDEO OFFER')
     console.log('\nDATA: ', data)

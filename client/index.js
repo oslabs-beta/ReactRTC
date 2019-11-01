@@ -9,6 +9,7 @@ const sessionConstraints = {video: true, audio: false};
 const iceServerConfig = {iceServers: [{urls: 'stun:stun.l.google.com:19302'}]};
 // create a local peerConnection utilizing stun servers
 const peerConnection = new RTCPeerConnection(iceServerConfig);
+let userID;
 socketConnection.onopen = () => {
   console.log('socket connection opened!')
 }
@@ -22,6 +23,7 @@ socketConnection.onmessage = async ({ data }) => {
   const parsedData = JSON.parse(data);
   try {
     // ? REFACTOR AS SWITCH CASE
+    console.log('hi user number ', userID);
     if (data) {
       if (parsedData.type === 'offer') {
         console.log('Offer has been recieved')
@@ -36,12 +38,13 @@ socketConnection.onmessage = async ({ data }) => {
       } else if (parsedData.type === 'answer') {
         console.log('Answer has been recieved')
         await peerConnection.setRemoteDescription(parsedData);
+      } else if (parsedData.type === 'icecandidate') {
+        await peerConnection.addIceCandidate(parsedData.candidate);
+      } else if (parsedData.userID) {
+        userID = parsedData.userID;
       } else {
         console.error('Unsupported SDP type');
       }
-    }
-    if (parsedData.type === 'icecandidate') {
-      await peerConnection.addIceCandidate(parsedData.candidate);
     }
     // * add else if statement for iceCandidate
   } catch(err) {
@@ -82,14 +85,6 @@ stopButton.addEventListener('click', (event) => {
  * them to do anything involving streamed media with WebRTC.
  */
 callButton.addEventListener('click', async (event) => {
-  // Since ICE doesn't know about your signaling server, your code handles 
-  // transmission of each candidate in your onIceHandler for the icecandidate event.
-  peerConnection.onicecandidate = onIceHandler;
-  // ? pc.ontrack only listens for tracks coming from remote peer (not local)
-  // https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/track_event
-  peerConnection.ontrack = onTrackHandler;
-  // Its job is to create and send an offer, to the callee, asking it to connect with us
-  peerConnection.onnegotiationneeded = onNegotiationNeededHandler;
   /**
    * @Step - THREE -
    * @Part (A) add MediaStreamTracks to the PeerConnection
@@ -166,3 +161,12 @@ const onNegotiationNeededHandler = async (negotiationNeededEvent) => {
     console.log("ERROR: ", err);
   }
 };
+
+// Since ICE doesn't know about your signaling server, your code handles 
+// transmission of each candidate in your onIceHandler for the icecandidate event.
+peerConnection.onicecandidate = onIceHandler;
+// ? pc.ontrack only listens for tracks coming from remote peer (not local)
+// https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/track_event
+peerConnection.ontrack = onTrackHandler;
+// Its job is to create and send an offer, to the callee, asking it to connect with us
+peerConnection.onnegotiationneeded = onNegotiationNeededHandler;

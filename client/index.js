@@ -3,8 +3,13 @@ const remoteVideo = document.querySelector('#remoteVideo');
 const startButton = document.querySelector('#start');
 const stopButton = document.querySelector('#stop');
 const callButton = document.querySelector('#call');
-const socketConnection = new WebSocket('wss://localhost:3000');
+const socketConnection = new WebSocket('wss://cbcd02f0.ngrok.io');
 const sessionConstraints = {video: true, audio: false};
+// .........................................................
+const chatBox = document.querySelector('.chat');
+const inputField = document.querySelector('.text');
+const sendMessageButton = document.querySelector('.sendMessage');
+// ...................................................
 // object with key iceServers that contains an array of URL objects to each STUN server
 const iceServerConfig = {iceServers: [{urls: 'stun:stun.l.google.com:19302'}]};
 // create a local peerConnection utilizing stun servers
@@ -21,9 +26,9 @@ socketConnection.onopen = () => {
 socketConnection.onmessage = async ({ data }) => {
   console.log('receiving data from signaling server aka WebSockets')
   const parsedData = JSON.parse(data);
+  // debugger
   try {
     // ? REFACTOR AS SWITCH CASE
-    console.log('hi user number ', userID);
     if (data) {
       if (parsedData.type === 'offer') {
         console.log('Offer has been recieved')
@@ -42,6 +47,9 @@ socketConnection.onmessage = async ({ data }) => {
         await peerConnection.addIceCandidate(parsedData.candidate);
       } else if (parsedData.userID) {
         userID = parsedData.userID;
+        console.log('hi user number ', userID);
+      } else if (parsedData.text) {
+        chatBox.innerHTML += `<li>${parsedData.text}</li>`;
       } else {
         console.error('Unsupported SDP type');
       }
@@ -133,9 +141,11 @@ const onIceHandler = (RTCPeerConnectionIceEvent) => {
  * track has been added to an RTCRtpReceiver which is part of the connection.
  */
 const onTrackHandler = (e) => {
-  debugger
-  if (remoteVideo.srcObject) return;
-  remoteVideo.srcObject = e.streams[0];
+  if (remoteVideo.srcObject) return console.log('Remote Video srcObject exist');
+  // remoteVideo.srcObject = e.streams[0];
+  remoteVideo.srcObject = new MediaStream([e.track]);
+  console.log('inside onTrackHandler', e)
+  console.log('Created remoteVideo.srcObject')
 };
 const onNegotiationNeededHandler = async (negotiationNeededEvent) => {
   /**
@@ -150,12 +160,14 @@ const onNegotiationNeededHandler = async (negotiationNeededEvent) => {
   try {
     // returns a RTCSessionDescription Object with a TYPE & SDP property
     const offer = await peerConnection.createOffer();
+    console.log('offer is about to be created before sending')
     // ! does not work with IE
     // * is Promised-based with Chrome (Android & Desktop) v51 | Opera (Android & Desktop) v43 | Android Webview v51 | Samsung Internet
     await peerConnection.setLocalDescription(offer);
     // after setLocalDescription has been fulfilled, an "icecandidate event" is sent to the RTCPeerConnection
     console.log('About to send data')
     // (B) send localDescription to remote peer
+    // ? possibly add a userID to send over to peer
     socketConnection.send(JSON.stringify(peerConnection.localDescription));
   } catch(err) {
     console.log("ERROR: ", err);
@@ -170,3 +182,10 @@ peerConnection.onicecandidate = onIceHandler;
 peerConnection.ontrack = onTrackHandler;
 // Its job is to create and send an offer, to the callee, asking it to connect with us
 peerConnection.onnegotiationneeded = onNegotiationNeededHandler;
+
+// _______________________________________________ SEND MESSAGE __________________________________________________
+
+sendMessageButton.addEventListener('click', (e) => {
+  const text = inputField.value;
+  socketConnection.send(JSON.stringify({text}));
+});

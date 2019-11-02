@@ -1,12 +1,13 @@
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
-const https = require('https');
+const https = require('http');
 const app = express(); 
 const WebSocket = require('ws');
 // const test = path.resolve(__dirname, '../client/index.js')
 const PORT = 3000;
 let count = 0;
+// const users = {};
 
 app.get('/index.js', (req, res) => res.sendFile(path.resolve(__dirname, '../client/index.js')));
 app.get('/', (req,res) => {
@@ -28,7 +29,10 @@ wss.on('connection', (websocket, incomingMessage, req) => {
   websocket.on('message', (data) => {
     console.log('\nINSIDE SERVER VIDEO OFFER')
     console.log('\nDATA: ', data)
-    websocket.send(data)
+    wss.clients.forEach((client) => {
+      console.log('IS CLIENT? ', client === websocket);
+      if (client !== websocket && client.readyState === WebSocket.OPEN) client.send(data);
+    })
   });
 });
 

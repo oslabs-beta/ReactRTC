@@ -26,35 +26,34 @@ socketConnection.onopen = () => {
 socketConnection.onmessage = async ({ data }) => {
   console.log('receiving data from signaling server aka WebSockets')
   const parsedData = JSON.parse(data);
-  // debugger
   try {
-    // ? REFACTOR AS SWITCH CASE
-    if (data) {
-      if (parsedData.type === 'offer') {
-        console.log('Offer has been recieved')
-        await peerConnection.setRemoteDescription(parsedData);
-        const localUserStream = await navigator.mediaDevices.getUserMedia(sessionConstraints)
-        localUserStream.getTracks().forEach((track) => {
-          peerConnection.addTrack(track, localUserStream);
-        });
-        const answer = await peerConnection.createAnswer();
-        await peerConnection.setLocalDescription(answer);
-        socketConnection.send(JSON.stringify(peerConnection.localDescription));
-      } else if (parsedData.type === 'answer') {
-        console.log('Answer has been recieved')
-        await peerConnection.setRemoteDescription(parsedData);
-      } else if (parsedData.type === 'icecandidate') {
-        await peerConnection.addIceCandidate(parsedData.candidate);
-      } else if (parsedData.userID) {
-        userID = parsedData.userID;
-        console.log('hi user number ', userID);
-      } else if (parsedData.text) {
-        chatBox.innerHTML += `<li>${parsedData.text}</li>`;
-      } else {
-        console.error('Unsupported SDP type');
+    if (parsedData.type) {
+      switch(parsedData.type) {
+        case 'offer': 
+          console.log('Offer has been recieved')
+          await peerConnection.setRemoteDescription(parsedData);
+          const localUserStream = await navigator.mediaDevices.getUserMedia(sessionConstraints)
+          localUserStream.getTracks().forEach((track) => {
+            peerConnection.addTrack(track, localUserStream);
+          });
+          const answer = await peerConnection.createAnswer();
+          await peerConnection.setLocalDescription(answer);
+          socketConnection.send(JSON.stringify(peerConnection.localDescription));
+          break;
+        case 'answer': 
+          console.log('Answer has been recieved')
+          await peerConnection.setRemoteDescription(parsedData);
+          break;
+        case 'icecandidate':
+          await peerConnection.addIceCandidate(parsedData.candidate);
+          break;
+        default:
+          console.error('Unsupported SDP type');
       }
-    }
-    // * add else if statement for iceCandidate
+    } else if (parsedData.text) {
+      chatBox.innerHTML += `<li>${parsedData.text}</li>`;
+      console.log('hi user number ', userID);
+    } else if (parsedData.userID) userID = parsedData.userID;
   } catch(err) {
     console.error("ERROR: ", err);
   }

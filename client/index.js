@@ -3,7 +3,7 @@ const remoteVideo = document.querySelector('#remoteVideo');
 const startButton = document.querySelector('#start');
 const stopButton = document.querySelector('#stop');
 const callButton = document.querySelector('#call');
-const socketConnection = new WebSocket('wss://cbcd02f0.ngrok.io');
+const socketConnection = new WebSocket('wss://832475e4.ngrok.io');
 const sessionConstraints = {video: true, audio: false};
 // .........................................................
 const chatBox = document.querySelector('.chat');

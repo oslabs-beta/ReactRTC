@@ -24,7 +24,8 @@ const server = https.createServer({
 // WEBSOCKET SECURED CONNECTION //
 const wss = new WebSocket.Server({ server });
 
-wss.on('connection', (websocket, incomingMessage, req) => {
+wss.on('connection', 
+(websocket, incomingMessage, req) => {
   websocket.send(JSON.stringify({ userID: ++count }));
   websocket.on('message', (data) => {
     console.log('\nINSIDE SERVER VIDEO OFFER');

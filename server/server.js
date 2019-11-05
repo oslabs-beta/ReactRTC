@@ -24,14 +24,14 @@ const server = https.createServer({
 // WEBSOCKET SECURED CONNECTION //
 const wss = new WebSocket.Server({server});
 
-wss.on('connection', (websocket, incomingMessage, req) => {
-  websocket.send(JSON.stringify({userID: ++count}));
-  websocket.on('message', (data) => {
+wss.on('connection', (currentClient, incomingMessage, req) => {
+  currentClient.send(JSON.stringify({userID: ++count}));
+  currentClient.on('message', (data) => {
     console.log('\nINSIDE SERVER VIDEO OFFER')
     console.log('\nDATA: ', data)
     wss.clients.forEach((client) => {
-      console.log('IS CLIENT? ', client === websocket);
-      if (client !== websocket && client.readyState === WebSocket.OPEN) client.send(data);
+      console.log('IS CLIENT? ', client === currentClient);
+      if (client !== currentClient && client.readyState === WebSocket.OPEN) client.send(data);
     })
   });
 });

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import ReactRTC from './components/ReactRTC/ReactRTC';
+import ReactRTC from './components/ReactRTC/ReactRTC.jsx';
 
 const Index = () => (
   <div>

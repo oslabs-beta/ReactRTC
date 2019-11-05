@@ -40,7 +40,7 @@ socketConnection.onmessage = async ({ data }) => {
           await peerConnection.setLocalDescription(answer);
           socketConnection.send(JSON.stringify(peerConnection.localDescription));
           break;
-        case 'answer': 
+        case 'answer':
           console.log('Answer has been recieved')
           await peerConnection.setRemoteDescription(parsedData);
           break;

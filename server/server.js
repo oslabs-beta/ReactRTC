@@ -4,6 +4,7 @@ const express = require('express');
 const https = require('http');
 const app = express(); 
 const WebSocket = require('ws');
+const SignalServer = require('../lib/SignalServer');
 // const test = path.resolve(__dirname, '../client/index.js')
 const PORT = 3000;
 let count = 0;
@@ -22,20 +23,22 @@ const server = https.createServer({
 }, app);
 
 // WEBSOCKET SECURED CONNECTION //
-const wss = new WebSocket.Server({ server });
+const ss = new SignalServer({ server });
+ss.connect();
+// const wss = new WebSocket.Server({ server });
 
-wss.on('connection', 
-(websocket, incomingMessage, req) => {
-  websocket.send(JSON.stringify({ userID: ++count }));
-  websocket.on('message', (data) => {
-    console.log('\nINSIDE SERVER VIDEO OFFER');
-    console.log('\nDATA: ', data);
-    wss.clients.forEach((client) => {
-      console.log('IS CLIENT? ', client === websocket);
-      if (client !== websocket && client.readyState === WebSocket.OPEN) client.send(data);
-    });
-  });
-});
+// wss.on('connection', 
+// (websocket, incomingMessage, req) => {
+//   websocket.send(JSON.stringify({ userID: ++count }));
+//   websocket.on('message', (data) => {
+//     console.log('\nINSIDE SERVER VIDEO OFFER');
+//     console.log('\nDATA: ', data);
+//     wss.clients.forEach((client) => {
+//       console.log('IS CLIENT? ', client === websocket);
+//       if (client !== websocket && client.readyState === WebSocket.OPEN) client.send(data);
+//     });
+//   });
+// });
 
 // ____________________________ //
 

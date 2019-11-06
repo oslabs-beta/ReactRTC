@@ -4,11 +4,9 @@ const express = require('express');
 const https = require('http');
 const app = express(); 
 const WebSocket = require('ws');
-const SignalServer = require('../lib/SignalServer');
-// const test = path.resolve(__dirname, '../client/index.js')
+const SignalServer = require('../../lib/SignalServer');
 const PORT = 3000;
 let count = 0;
-// const users = {};
 
 app.get('/index.js', (req, res) => res.sendFile(path.resolve(__dirname, '../client/index.js')));
 app.get('/', (req, res) => {

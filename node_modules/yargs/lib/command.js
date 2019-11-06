@@ -1,8 +1,6 @@
 'use strict'
 
 const inspect = require('util').inspect
-const isPromise = require('./is-promise')
-const { applyMiddleware, commandMiddlewareFactory } = require('./middleware')
 const path = require('path')
 const Parser = require('yargs-parser')
 
@@ -17,12 +15,12 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
   let aliasMap = {}
   let defaultCommand
   globalMiddleware = globalMiddleware || []
-
-  self.addHandler = function addHandler (cmd, description, builder, handler, commandMiddleware) {
+  self.addHandler = function addHandler (cmd, description, builder, handler, middlewares) {
     let aliases = []
-    const middlewares = commandMiddlewareFactory(commandMiddleware)
     handler = handler || (() => {})
-
+    middlewares = middlewares || []
+    globalMiddleware.push(...middlewares)
+    middlewares = globalMiddleware
     if (Array.isArray(cmd)) {
       aliases = cmd.slice(1)
       cmd = cmd[0]
@@ -225,25 +223,23 @@ module.exports = function command (yargs, usage, validation, globalMiddleware) {
       positionalMap = populatePositionals(commandHandler, innerArgv, currentContext, yargs)
     }
 
-    const middlewares = globalMiddleware.slice(0).concat(commandHandler.middlewares || [])
-    applyMiddleware(innerArgv, yargs, middlewares, true)
-
     // we apply validation post-hoc, so that custom
     // checks get passed populated positional arguments.
     if (!yargs._hasOutput()) yargs._runValidation(innerArgv, aliases, positionalMap, yargs.parsed.error)
 
     if (commandHandler.handler && !yargs._hasOutput()) {
       yargs._setHasOutput()
-
-      innerArgv = applyMiddleware(innerArgv, yargs, middlewares, false)
-
-      const handlerResult = isPromise(innerArgv)
-        ? innerArgv.then(argv => commandHandler.handler(argv))
-        : commandHandler.handler(innerArgv)
-
-      if (isPromise(handlerResult)) {
-        handlerResult.catch(error =>
-          yargs.getUsageInstance().fail(null, error)
+      if (commandHandler.middlewares.length > 0) {
+        const middlewareArgs = commandHandler.middlewares.reduce(function (initialObj, middleware) {
+          return Object.assign(initialObj, middleware(innerArgv))
+        }, {})
+        Object.assign(innerArgv, middlewareArgs)
+      }
+      const handlerResult = commandHandler.handler(innerArgv)
+      if (handlerResult && typeof handlerResult.then === 'function') {
+        handlerResult.then(
+          null,
+          (error) => yargs.getUsageInstance().fail(null, error)
         )
       }
     }

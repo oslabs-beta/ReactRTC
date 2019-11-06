@@ -11,7 +11,7 @@ const Y18n = require('y18n')
 const objFilter = require('./lib/obj-filter')
 const setBlocking = require('set-blocking')
 const applyExtends = require('./lib/apply-extends')
-const { globalMiddlewareFactory } = require('./lib/middleware')
+const middlewareFactory = require('./lib/middleware')
 const YError = require('./lib/yerror')
 
 exports = module.exports = Yargs
@@ -33,7 +33,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     updateFiles: false
   })
 
-  self.middleware = globalMiddlewareFactory(globalMiddleware, self)
+  self.middleware = middlewareFactory(globalMiddleware, self)
 
   if (!cwd) cwd = process.cwd()
 
@@ -765,14 +765,6 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
   self.getStrict = () => strict
 
-  let parserConfig = {}
-  self.parserConfiguration = function parserConfiguration (config) {
-    argsert('<object>', [config], arguments.length)
-    parserConfig = config
-    return self
-  }
-  self.getParserConfiguration = () => parserConfig
-
   self.showHelp = function (level) {
     argsert('[string|function]', [level], arguments.length)
     if (!self.parsed) self._parseArgs(processArgs) // run parser, if it has not already been executed.
@@ -903,7 +895,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     // register the completion command.
     completionCommand = cmd || 'completion'
     if (!desc && desc !== false) {
-      desc = 'generate completion script'
+      desc = 'generate bash completion script'
     }
     self.command(completionCommand, desc)
 
@@ -1018,14 +1010,7 @@ function Yargs (processArgs, cwd, parentRequire) {
     args = args || processArgs
 
     options.__ = y18n.__
-    options.configuration = self.getParserConfiguration()
-
-    // Deprecated
-    let pkgConfig = pkgUp()['yargs']
-    if (pkgConfig) {
-      console.warn('Configuring yargs through package.json is deprecated and will be removed in the next major release, please use the JS API instead.')
-      options.configuration = Object.assign({}, pkgConfig, options.configuration)
-    }
+    options.configuration = pkgUp()['yargs'] || {}
 
     const parsed = Parser.detailed(args, options)
     let argv = parsed.argv
@@ -1167,7 +1152,7 @@ function Yargs (processArgs, cwd, parentRequire) {
   }
 
   self._runValidation = function runValidation (argv, aliases, positionalMap, parseErrors) {
-    if (parseErrors) throw new YError(parseErrors.message || parseErrors)
+    if (parseErrors) throw new YError(parseErrors.message)
     validation.nonOptionCount(argv)
     validation.requiredArguments(argv)
     if (strict) validation.unknownArguments(argv, aliases, positionalMap)

@@ -30,7 +30,7 @@ const wss = new WebSocket.Server({ port: PORT });
 
 wss.on('connection', (websocket, incomingMessage, req) => {
   console.log('web socket fired up');
-  websocket.send(JSON.stringify({ userID: ++count }));
+  // websocket.send(JSON.stringify({ userID: ++count }));
   websocket.on('message', data => {
     console.log('\nINSIDE SERVER VIDEO OFFER');
     console.log('\nDATA: ', data);

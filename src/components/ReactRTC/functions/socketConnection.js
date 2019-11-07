@@ -4,10 +4,10 @@
 // const async socketConnectionFunc = () => {
   //check if it needs to be static 
 module.exports ={
- onMessage: onMessage = async (data, peerConnection, socketConnection) => {
+ onMessage: onMessage = async (parsedData, peerConnection, socketConnection, sessionConstraints) => {
   //  console.log('parsedData.type: ', parsedData.type)
-    console.log('receiving data from signaling server aka WebSockets', data);
-    const parsedData = JSON.parse(data.data);
+    // console.log('receiving data from signaling server aka WebSockets', data);
+    // const parsedData = JSON.parse(data.data);
 
     console.log('parsed data var', parsedData)
     try {
@@ -24,6 +24,7 @@ module.exports ={
               peerConnection.addTrack(track, localUserStream);
             });
             const answer = await peerConnection.createAnswer();
+            console.log('Answer is being created' )
             await peerConnection.setLocalDescription(answer);
             socketConnection.send(
               JSON.stringify(peerConnection.localDescription)

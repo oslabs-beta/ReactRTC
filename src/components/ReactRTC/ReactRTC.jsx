@@ -18,15 +18,16 @@ class ReactRTC extends React.Component {
     this.onIceHandler = this.onIceHandler.bind(this);
     this.onTrackHandler = this.onTrackHandler.bind(this);
     this.onNegotiationNeededHandler = this.onNegotiationNeededHandler.bind(this);
+    this.callButtonGetTracks = this.callButtonGetTracks.bind(this)
   }
   // sessionConstraints = {video:true, audio:false}
-  socketConnection = new WebSocket('ws://localhost:3000/');
+  socketConnection = new WebSocket('wss://96c49da3.ngrok.io');
   iceServerConfig = {iceServers:[{ urls: 'stun:stun.l.google.com:19302' }]}
   peerConnection = new RTCPeerConnection(this.iceServerConfig);
   
   handleUserMedia(mediaStream){
     this.setState({localStream:mediaStream},()=> {
-      console.log('hitting setState')
+      console.log('hitting setState for handleUserMedia')
     })
     // console.log('localstream', this.state.localStream)
     const localVideo = document.querySelector('#localVideo');
@@ -47,14 +48,14 @@ class ReactRTC extends React.Component {
   
     // this.setState({localStream:endAudioStream})
   }
-  callButtonGetTracks(){
-    async() => {
-     
-      this.state.localStream.getTracks().forEach((mediaStreamTrack)=>{
+  async callButtonGetTracks(){
+ 
+    console.log('looking for localStream -->', this.state.localStream)
+    await this.state.localStream.getTracks().forEach((mediaStreamTrack)=>{
+        console.log('hitting forEach getTracks')
         this.peerConnection.addTrack(mediaStreamTrack);
-      })
-      
-    }
+      });
+    
   }
 
   onIceHandler(RTCPeerConnectionIceEvent){
@@ -65,11 +66,12 @@ class ReactRTC extends React.Component {
   }
   
   onTrackHandler(event){
+    console.log('hitting onTrackHandler')
     const remoteVideo = document.querySelector('#remoteVideo');
     remoteVideo.srcObject = new MediaStream([event.track]);
   }
-  onNegotiationNeededHandler(){
-    async(negotiationNeededEvent)=>{
+  async onNegotiationNeededHandler(negotiationNeededEvent){
+    console.log('hitting onNegotiationNeededHandler')
       try{
         const offer = await this.peerConnection.createOffer();
         console.log('offer is about to be created before sending');
@@ -83,7 +85,7 @@ class ReactRTC extends React.Component {
       catch(err){
         console.error("ERROR:", err);
       }
-    }
+    
   }
 
   componentDidMount(){
@@ -93,13 +95,13 @@ class ReactRTC extends React.Component {
         }
         this.socketConnection.onmessage = event =>{
           console.log('event', event)
-          console.log('eventdata', JSON.parse(event.data))
+          // console.log('eventdata', JSON.parse(event.data))
 
           // testing = OnMessage()
           // console.log('hitting')
           const messageData = JSON.parse(event.data);
           console.log('messageData', messageData)
-           onMessage(messageData, this.peerConnection, this.socketConnection)
+           onMessage(messageData, this.peerConnection, this.socketConnection, this.state.sessionConstraints)
           } 
           this.socketConnection.onclose = (event) => {
             // console.log('Socket is closed. Reconnecting will be attempted in 1 second', event.reason);

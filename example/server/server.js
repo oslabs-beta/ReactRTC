@@ -14,10 +14,10 @@ app.get('/', (req, res) => {
 });
 // Adding in a express server to HTTPS to allow HTTPS
 const server = https.createServer({
-  key: fs.readFileSync(path.resolve(__dirname, '../ssl/server.key')),
+  key: fs.readFileSync(path.resolve(__dirname, '../../ssl/server.key')),
   // is required to allow localhost to run on HTTPS
   // otherwise you either get an error or a certified invalid warning
-  cert: fs.readFileSync(path.resolve(__dirname, '../ssl/server.crt')),
+  cert: fs.readFileSync(path.resolve(__dirname, '../../ssl/server.crt')),
 }, app);
 
 // WEBSOCKET SECURED CONNECTION //

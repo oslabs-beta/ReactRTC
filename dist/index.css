@@ -20,7 +20,7 @@ body {
 	align-items: center;
 	display:  flex;
 	flex-direction: column;
-	/* box-shadow: 10px 5px 5px #252525; */
+	box-shadow: 10px 5px 5px #252525;
 	width: 480px;
 	margin: 48px auto;
 }
@@ -71,18 +71,18 @@ body {
 }
 
 .icon--start {
-	background-image: url('./assets/images/camera-icon.png');
+	background-image: url('https://github.com/oslabs-beta/ReactRTC/blob/diane_react/dist/assets/images/camera-icon.png');
 }
 
 .icon--stop {
 	width: 60px;
 	height: 60px;
-	background-image: url('./assets/images/stop-icon.png');
+	background-image: url('https://github.com/oslabs-beta/ReactRTC/blob/diane_react/dist/assets/images/stop-icon.png');
 	opacity: 75%;
 }
 
 .icon--call {
 	width: 46px;
 	height: 46px;
-	background-image: url('./assets/images/phone-icon.png');
+	background-image: url('https://github.com/oslabs-beta/ReactRTC/blob/diane_react/dist/assets/images/phone-icon.png');
 }

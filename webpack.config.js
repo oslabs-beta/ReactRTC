@@ -22,4 +22,9 @@ module.exports = {
     ],
   },
   plugins: [htmlWebpackPlugin],
+  devServer: {
+    proxy: {
+      '/index.css': 'http://localhost:3000'
+    }
+  }
 };

@@ -1,8 +1,88 @@
+* {
+	box-sizing: border-box;
+	margin: 0;
+}
+
+body {
+	background-image: linear-gradient(rgba(100,202,117, 0.5), rgba(80,180,202, 0.5));
+	height: 100vh;
+	/* background-color: rgb(80,180,202); */
+}
+
+.react-rtc {
+	display: flex;
+	flex-direction: column;
+}
+
+/* -------------------------------------------- */
+
+.videoContainer {
+	align-items: center;
+	display:  flex;
+	flex-direction: column;
+	/* box-shadow: 10px 5px 5px #252525; */
+	width: 480px;
+	margin: 48px auto;
+}
+
 #localVideo {
-    width: 360px; 
-    border: 1px solid black;
+	background-color: slategrey;
+	width: 480px;
+	/* border: 5px solid #252525; */
+	/* border-bottom: 1px solid #252525; */
 }
 #remoteVideo {
-    width: 360px; 
-    border: 1px solid black;
+	/* display: none; */
+	width: 480px;
+	/* border: 5px solid #252525; */
+	/* border-top: 1px solid #252525; */
+	background-color: slategrey;
+}
+
+/* ------------------------------------------ */
+
+.button-container {
+	display: flex;
+	margin: 16px auto;
+	width: fit-content;
+	border: 2px solid black;
+	padding: 10px;
+	border-radius: 20px;
+}
+
+.button {
+	display: flex;
+	align-items: center;
+	/* border: 1px solid whitesmoke; */
+	background-image: linear-gradient(to right,rgb(100,202,117), rgb(80,180,202));
+	border-radius: 50%;
+	justify-content: center;
+	margin: 4px;
+	width: 72px;
+	height: 72px;
+	cursor: pointer;
+}
+
+.icon {
+	width: 48px;
+	height: 48px;
+	background-position: center;
+	background-size: contain;
+}
+
+.icon--start {
+	background-image: url('./assets/images/camera-icon.png');
+}
+
+.icon--stop {
+	width: 60px;
+	height: 60px;
+	background-image: url('./assets/images/stop-icon.png');
+	opacity: 75%;
+}
+
+.icon--call {
+	width: 46px;
+	height: 46px;
+	background-image: url('./assets/images/phone-icon.png');
 }

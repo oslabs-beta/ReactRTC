@@ -12,6 +12,7 @@ const PORT = 3000;
 
 // app.get('/index.js', (req, res) => res.sendFile(path.resolve(__dirname, '../client/index.js')));
 // app.use(express.static(path.resolve(__dirname, './dist')));
+// app.use(express.static(path.resolve(__dirname, './dist/assets/images')));
 app.get('/main.js', (req, res) => {
   res.sendFile(path.resolve(__dirname, './dist/main.js'));
 });

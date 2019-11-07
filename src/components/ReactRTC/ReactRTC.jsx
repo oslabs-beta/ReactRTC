@@ -21,7 +21,7 @@ class ReactRTC extends React.Component {
     this.callButtonGetTracks = this.callButtonGetTracks.bind(this)
   }
   // sessionConstraints = {video:true, audio:false}
-  socketConnection = new WebSocket('wss://96c49da3.ngrok.io');
+  socketConnection = new WebSocket('wss://67ee0fe3.ngrok.io');
   iceServerConfig = {iceServers:[{ urls: 'stun:stun.l.google.com:19302' }]}
   peerConnection = new RTCPeerConnection(this.iceServerConfig);
   
@@ -69,6 +69,7 @@ class ReactRTC extends React.Component {
     console.log('hitting onTrackHandler')
     const remoteVideo = document.querySelector('#remoteVideo');
     remoteVideo.srcObject = new MediaStream([event.track]);
+    remoteVideo.style.display = 'block'
   }
   async onNegotiationNeededHandler(negotiationNeededEvent){
     console.log('hitting onNegotiationNeededHandler')
@@ -123,13 +124,23 @@ class ReactRTC extends React.Component {
           
     
     return (
-      <div>
-        <h1>ReactRTC!!</h1>
-        <video id="localVideo" autoPlay ></video>
-        <video id="remoteVideo" autoPlay ></video>
-        <button id="start" onClick = {this.getUserMedia}>Start</button>
-        <button id="stop" onClick = {this.stopStream}>Stop</button>
-        <button id="call"onClick = {this.callButtonGetTracks}>Call</button>
+      <div className='react-rtc'>
+        <div className='videoContainer'>
+        <video id='localVideo' autoPlay ></video>
+        <video id='remoteVideo' autoPlay ></video>
+        </div>
+
+        <section className='button-container'>
+          <div className='button' onClick = {this.getUserMedia}>
+            <div className='icon icon--start'></div>
+          </div>
+          <div className='button' onClick = {this.stopStream}>
+            <div className='icon icon--stop'></div>
+          </div>
+          <div className='button'onClick = {this.callButtonGetTracks}>
+            <div className='icon icon--call'></div>
+          </div>
+        </section>
       </div>
     );
   }

@@ -1,6 +1,7 @@
 # global
 node_modules
 package-lock.json
-
+.DS_store
 # directory for utilizing a SSL Certificate
 ssl
+ssl_diane

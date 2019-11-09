@@ -124,6 +124,7 @@ class ReactRTC extends React.Component {
           }
           
           render() {
+            //move these to componentDidmount
             this.peerConnection.onicecandidate = this.onIceHandler;
             this.peerConnection.ontrack= this.onTrackHandler;
             this.peerConnection.onnegotiationneeded = this.onNegotiationNeededHandler;

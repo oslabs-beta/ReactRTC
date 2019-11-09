@@ -2,6 +2,10 @@ import React from 'react';
 import {onMessage} from './functions/socketConnection.js';
 import "regenerator-runtime/runtime";
 import "core-js/stable";
+import cameraIcon from '../../../dist/assets/images/camera-icon.png';
+import phoneIcon from '../../../dist/assets/images/phone-icon.png';
+import stopIcon from '../../../dist/assets/images/stop-icon.png';
+import reactRTCLogo from '../../../dist/assets/images/reactrtc.png';
 
 // console.log('testing here ===>', this.onMessage)
 class ReactRTC extends React.Component {
@@ -26,6 +30,8 @@ class ReactRTC extends React.Component {
   peerConnection = new RTCPeerConnection(this.iceServerConfig);
   
   handleUserMedia(mediaStream){
+    const reactLogo = document.querySelector('.react-rtc__logo');
+    reactLogo.style.display = 'none';
     this.setState({localStream:mediaStream},()=> {
       console.log('hitting setState for handleUserMedia')
     })
@@ -126,19 +132,24 @@ class ReactRTC extends React.Component {
     return (
       <div className='react-rtc'>
         <div className='videoContainer'>
+        <img className='react-rtc__logo' src={reactRTCLogo} alt=""/>
         <video id='localVideo' autoPlay ></video>
         <video id='remoteVideo' autoPlay ></video>
         </div>
 
         <section className='button-container'>
-          <div className='button' onClick = {this.getUserMedia}>
-            <div className='icon icon--start'></div>
+          <div className='button button--start-color' onClick = {this.getUserMedia}>
+            {/* <div 
+            className='icon icon--start'
+            style={{backgroundImage: cameraIcon}}
+            ></div> */}
+            <img className='icon icon--start' src={cameraIcon} alt=""/>
           </div>
-          <div className='button' onClick = {this.stopStream}>
-            <div className='icon icon--stop'></div>
+          <div className='button button--stop-color' onClick = {this.stopStream}>
+            <img className='icon icon--stop' src={stopIcon} />
           </div>
-          <div className='button'onClick = {this.callButtonGetTracks}>
-            <div className='icon icon--call'></div>
+          <div className='button button--call-color'onClick = {this.callButtonGetTracks}>
+            <img className='icon icon--call' src={phoneIcon} />
           </div>
         </section>
       </div>

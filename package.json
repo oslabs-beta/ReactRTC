@@ -1,0 +1,17 @@
+{
+  "name": "webrtc-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "ws": "^7.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon example/server/server.js"
+  },
+  "author": "",
+  "license": "ISC"
+}

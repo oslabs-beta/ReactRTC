@@ -1,8 +1,6 @@
-const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const https = require('http');
-
 const app = express();
 const WebSocket = require('ws');
 // const test = path.resolve(__dirname, '../client/index.js')

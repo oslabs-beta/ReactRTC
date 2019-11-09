@@ -25,7 +25,7 @@ class ReactRTC extends React.Component {
     this.callButtonGetTracks = this.callButtonGetTracks.bind(this)
   }
   // sessionConstraints = {video:true, audio:false}
-  socketConnection = new WebSocket('wss://67ee0fe3.ngrok.io');
+  socketConnection = new WebSocket('wss://8aa0c4db.ngrok.io');
   iceServerConfig = {iceServers:[{ urls: 'stun:stun.l.google.com:19302' }]}
   peerConnection = new RTCPeerConnection(this.iceServerConfig);
   

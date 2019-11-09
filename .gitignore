@@ -1,0 +1,9 @@
+# global
+node_modules
+package-lock.json
+.DS_Store
+src/.DS_Store
+
+# directory for utilizing a SSL Certificate
+ssl
+ssl_diane

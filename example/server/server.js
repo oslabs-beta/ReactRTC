@@ -31,6 +31,8 @@ const server = https.createServer(
   app
 );
 
+//variable for websocket rooms
+let room_Channels = {};
 // WEBSOCKET SECURED CONNECTION //
 const wss = new WebSocket.Server({ server });
 // const wss = new WebSocket.Server({ port: PORT });
@@ -39,6 +41,26 @@ wss.on('connection', (websocket, incomingMessage, req) => {
   console.log('web socket fired up');
   // websocket.send(JSON.stringify({ userID: ++count }));
   websocket.on('message', data => {
+    //check if roomcode exists
+    let verified = false;
+    let roomAccessCode = data.roomAccessCode
+    if(roomcode){
+      verified = true;
+      room = room_Channels[data.roomAccessCode];
+      if(!roomcode){
+        room_channels[key] = [websocket];
+        key = roomcode;
+      }
+      else{
+        room_Channels.push(websocket)
+      }
+    }
+    else{
+      console.log('room access code doesnt match')
+    }
+    console.log('this is the room object', room_Channels)
+
+
     console.log('\nINSIDE SERVER VIDEO OFFER');
     console.log('\nDATA: ', data);
     wss.clients.forEach(client => {

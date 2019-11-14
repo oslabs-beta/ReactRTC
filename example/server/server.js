@@ -31,8 +31,8 @@ const server = https.createServer(
   app
 );
 
-//variable for websocket rooms
-let room_Channels = {};
+// variable for websocket rooms
+let roomChannels = {};
 // WEBSOCKET SECURED CONNECTION //
 const wss = new WebSocket.Server({ server });
 // const wss = new WebSocket.Server({ port: PORT });
@@ -41,33 +41,52 @@ wss.on('connection', (websocket, incomingMessage, req) => {
   console.log('web socket fired up');
   // websocket.send(JSON.stringify({ userID: ++count }));
   websocket.on('message', data => {
-    //check if roomcode exists
-    let verified = false;
-    let roomAccessCode = data.roomAccessCode
-    if(roomcode){
-      verified = true;
-      room = room_Channels[data.roomAccessCode];
-      if(!roomcode){
-        room_channels[key] = [websocket];
-        key = roomcode;
-      }
-      else{
-        room_Channels.push(websocket)
-      }
-    }
-    else{
-      console.log('room access code doesnt match')
-    }
-    console.log('this is the room object', room_Channels)
-
-
-    console.log('\nINSIDE SERVER VIDEO OFFER');
     console.log('\nDATA: ', data);
-    wss.clients.forEach(client => {
-      console.log('IS CLIENT? ', client === websocket);
-      if (client !== websocket && client.readyState === WebSocket.OPEN)
-        client.send(data);
-    });
+    //check if roomcode exists
+    const parsedMessage = JSON.parse(data);
+    if (parsedMessage.roomKey) {
+      const { roomKey } = parsedMessage;
+      // if room exist and room is not full (max of 2 clients per room)
+      if (roomChannels.hasOwnProperty(roomKey) && roomChannels[roomKey].length < 2) {
+        console.log('New client has joined room ', roomKey);
+        // client joins the room
+        roomChannels[roomKey].push(websocket);
+        // set room ready object
+        const ready = {startConnection: true}
+        // notify client that created the room to begin WebRTC Connection
+        roomChannels[0].send(JSON.stringify(ready));
+      // if room doesn't exist
+      } else if (!roomChannels.hasOwnProperty(roomKey)) {
+        // create new room & store current client in an array
+        roomChannels[roomKey] = [websocket];
+        console.log('New room has been created with key: ', roomKey)
+        console.log('Room Count: ', Object.keys(roomChannels).length);
+      }
+    } else {
+      console.log('\nINSIDE SERVER VIDEO OFFER');
+      wss.clients.forEach(client => {
+        console.log('IS CLIENT? ', client === websocket);
+        if (client !== websocket && client.readyState === WebSocket.OPEN)
+          client.send(data);
+      });
+    }
+    // let roomAccessCode = data.roomAccessCode
+    // if(roomcode){
+    //   verified = true;
+    //   room = room_Channels[data.roomAccessCode];
+    //   if(!roomcode){
+    //     room_channels[key] = [websocket];
+    //     key = roomcode;
+    //   }
+    //   else{
+    //     room_Channels.push(websocket)
+    //   }
+    // }
+    // else{
+    //   console.log('room access code doesnt match')
+    // }
+    // console.log('this is the room object', room_Channels)
+
   });
 });
 

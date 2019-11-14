@@ -17,7 +17,7 @@ module.exports ={
           case 'offer':
             console.log('Offer has been recieved');
             await peerConnection.setRemoteDescription(parsedData);
-            
+
             const localUserStream = await navigator.mediaDevices.getUserMedia(
               sessionConstraints
             );
@@ -41,10 +41,9 @@ module.exports ={
           default:
             console.error('Unsupported SDP type');
         }
-      } else if (parsedData.text) {
-        chatBox.innerHTML += `<li>${parsedData.text}</li>`;
-        console.log('hi user number ', userID);
-      } else if (parsedData.userID) userID = parsedData.userID;
+      } else if (parsedData.startConnection) {
+        console.log('current room is ready for RTC Peer Connection')
+      }
     } catch (err) {
       console.error('ERROR: ', err);
     }

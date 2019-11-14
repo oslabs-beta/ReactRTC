@@ -49,7 +49,8 @@ class ReactRTC extends React.Component {
     // console.log('localstream', this.state.localStream)
     const localVideo = document.querySelector('#localVideo');
     localVideo.srcObject = this.state.localStream;
-    const roomKey = uuidGenerator();
+    // send the roomKey
+    const roomKey = JSON.stringify({ roomKey: uuidGenerator() });
     this.socketConnection.send(roomKey);
   }
 
@@ -126,7 +127,7 @@ class ReactRTC extends React.Component {
       // setTimeout(()=>{
       //   connect();
       // },1000)
-      console.log('outside reconnect')
+      console.log('outside reconnect', event)
     }
         
     this.socketConnection.onerror = (err) => {

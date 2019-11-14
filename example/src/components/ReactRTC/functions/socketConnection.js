@@ -17,6 +17,7 @@ module.exports ={
           case 'offer':
             console.log('Offer has been recieved');
             await peerConnection.setRemoteDescription(parsedData);
+            
             const localUserStream = await navigator.mediaDevices.getUserMedia(
               sessionConstraints
             );

@@ -7,14 +7,29 @@ import phoneIcon from '../../../dist/assets/images/phone-icon.png';
 import stopIcon from '../../../dist/assets/images/stop-icon.png';
 import reactRTCLogo from '../../../dist/assets/images/reactrtc.png';
 
-// console.log('testing here ===>', this.onMessage)
+function socketConnection(url){
+  return new WebSocket(url)
+}
+
+function uuidGenerator() {
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+  );
+}
+
 class ReactRTC extends React.Component {
   constructor() {
     super();
     this.state = {
       sessionConstraints:{video:true, audio:false},
-      localStream:null
+      localStream:null,
+      localVideo:null,
+      remoteVideo:null
     }
+    // currently the url is hard-coded: need to change it to a variable for this.props.socketURL later
+    this.socketConnection = socketConnection('wss://0627a449.ngrok.io');
+    this.iceServerConfig = {iceServers:[{ urls: 'stun:stun.l.google.com:19302' }]}
+    this.peerConnection = new RTCPeerConnection(this.iceServerConfig);
 
     this.getUserMedia = this.getUserMedia.bind(this);
     this.handleUserMedia = this.handleUserMedia.bind(this);
@@ -24,112 +39,103 @@ class ReactRTC extends React.Component {
     this.onNegotiationNeededHandler = this.onNegotiationNeededHandler.bind(this);
     this.callButtonGetTracks = this.callButtonGetTracks.bind(this)
   }
-  // sessionConstraints = {video:true, audio:false}
-  socketConnection = new WebSocket('wss://b04f9a71.ngrok.io');
-  iceServerConfig = {iceServers:[{ urls: 'stun:stun.l.google.com:19302' }]}
-  peerConnection = new RTCPeerConnection(this.iceServerConfig);
   
-  handleUserMedia(mediaStream){
+  handleUserMedia(mediaStream) {
     const reactLogo = document.querySelector('.react-rtc__logo');
     reactLogo.style.display = 'none';
-    this.setState({localStream:mediaStream},()=> {
+    this.setState({ localStream: mediaStream }, () => {
       console.log('hitting setState for handleUserMedia')
     })
     // console.log('localstream', this.state.localStream)
     const localVideo = document.querySelector('#localVideo');
     localVideo.srcObject = this.state.localStream;
+    const roomKey = uuidGenerator();
+    this.socketConnection.send(roomKey);
   }
 
-  getUserMedia(event){
+  getUserMedia(event) {
     navigator.mediaDevices.getUserMedia(this.state.sessionConstraints)
     .then(this.handleUserMedia)
-    .catch((err) => { console.error('Err:'. err)})
+    .catch((err) => { console.error('Err:'. err) })
   }
-  stopStream(event){
+
+  stopStream(event) {
     const endVideoStream = this.state.localStream.getVideoTracks()[0].stop()
     // const endAudioStream = this.state.localStream.getAudioTracks()[0].stop()
-    this.setState({localStream:endVideoStream});
-  //NOTE: will need to add audio tracks later
-      console.log('hitting both endVideoStream')
+    this.setState({ localStream: endVideoStream });
+    //NOTE: will need to add audio tracks later
+    console.log('hitting both endVideoStream')
   
     // this.setState({localStream:endAudioStream})
   }
-  async callButtonGetTracks(){
- 
+
+  async callButtonGetTracks() {
     console.log('looking for localStream -->', this.state.localStream)
-    await this.state.localStream.getTracks().forEach((mediaStreamTrack)=>{
-        console.log('hitting forEach getTracks')
-        this.peerConnection.addTrack(mediaStreamTrack);
-      });
-    
+    await this.state.localStream.getTracks().forEach((mediaStreamTrack) => {
+      console.log('hitting forEach getTracks')
+      this.peerConnection.addTrack(mediaStreamTrack);
+    });
   }
 
-  onIceHandler(RTCPeerConnectionIceEvent){
+  onIceHandler(RTCPeerConnectionIceEvent) {
     if(RTCPeerConnectionIceEvent.candidate){
       const {type, candidate} = RTCPeerConnectionIceEvent;
       this.socketConnection.send(JSON.stringify({type, candidate}))
     }
   }
   
-  onTrackHandler(event){
+  onTrackHandler(event) {
     console.log('hitting onTrackHandler')
     const remoteVideo = document.querySelector('#remoteVideo');
     remoteVideo.srcObject = new MediaStream([event.track]);
     remoteVideo.style.display = 'block'
   }
-  async onNegotiationNeededHandler(negotiationNeededEvent){
+
+  async onNegotiationNeededHandler(negotiationNeededEvent) {
     console.log('hitting onNegotiationNeededHandler')
-      try{
-        const offer = await this.peerConnection.createOffer();
-        console.log('offer is about to be created before sending');
+    try {
+      const offer = await this.peerConnection.createOffer();
+      console.log('offer is about to be created before sending');
 
-        await this.peerConnection.setLocalDescription(offer);
+      await this.peerConnection.setLocalDescription(offer);
 
-        console.log('About to send data');
+      console.log('About to send data');
 
-        this.socketConnection.send(JSON.stringify(this.peerConnection.localDescription));
-      }
-      catch(err){
-        console.error("ERROR:", err);
-      }
-    
+      this.socketConnection.send(JSON.stringify(this.peerConnection.localDescription));
+    } catch(err) {
+      console.error("ERROR:", err);
+    }
   }
 
-  componentDidMount(){
+  componentDidMount() {
+    this.peerConnection.onicecandidate = this.onIceHandler;
+    this.peerConnection.ontrack= this.onTrackHandler;
+    this.peerConnection.onnegotiationneeded = this.onNegotiationNeededHandler;
 
-        this.socketConnection.onopen = () =>{
-          console.log('connected')
-        }
-        this.socketConnection.onmessage = event =>{
-          console.log('event', event)
-          // console.log('eventdata', JSON.parse(event.data))
-
-          // testing = OnMessage()
-          // console.log('hitting')
-          const messageData = JSON.parse(event.data);
-          console.log('messageData', messageData)
-           onMessage(messageData, this.peerConnection, this.socketConnection, this.state.sessionConstraints)
-          } 
-          this.socketConnection.onclose = (event) => {
-            // console.log('Socket is closed. Reconnecting will be attempted in 1 second', event.reason);
-            // setTimeout(()=>{
-              //   connect();
-              // },1000)
-              console.log('outside reconnect')
-            }
-            
-            this.socketConnection.onerror = (err) => {
-              console.error('Socket encountered this error ==>', err.message, 'Closing socket');
-            }
-          }
+    this.socketConnection.onopen = () => {
+      console.log('connected')
+    }
+    this.socketConnection.onmessage = (event) => {
+      console.log('event', event)
+      const messageData = JSON.parse(event.data);
+      console.log('messageData', messageData)
+        onMessage(messageData, this.peerConnection, this.socketConnection, this.state.sessionConstraints)
+      } 
+    this.socketConnection.onclose = (event) => {
+      // console.log('Socket is closed. Reconnecting will be attempted in 1 second', event.reason);
+      // setTimeout(()=>{
+      //   connect();
+      // },1000)
+      console.log('outside reconnect')
+    }
+        
+    this.socketConnection.onerror = (err) => {
+      console.error('Socket encountered this error ==>', err.message, 'Closing socket');
+    }
+  }
           
-          render() {
-            //move these to componentDidmount
-            this.peerConnection.onicecandidate = this.onIceHandler;
-            this.peerConnection.ontrack= this.onTrackHandler;
-            this.peerConnection.onnegotiationneeded = this.onNegotiationNeededHandler;
-          
-    
+        
+  render() {
     return (
       <div className='react-rtc'>
         <div className='videoContainer'>
@@ -140,10 +146,6 @@ class ReactRTC extends React.Component {
 
         <section className='button-container'>
           <div className='button button--start-color' onClick = {this.getUserMedia}>
-            {/* <div 
-            className='icon icon--start'
-            style={{backgroundImage: cameraIcon}}
-            ></div> */}
             <img className='icon icon--start' src={cameraIcon} alt=""/>
           </div>
           <div className='button button--stop-color' onClick = {this.stopStream}>

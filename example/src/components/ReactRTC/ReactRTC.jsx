@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import {onMessage} from './functions/socketConnection.js';
 import "regenerator-runtime/runtime";
 import "core-js/stable";
@@ -17,17 +17,18 @@ function uuidGenerator() {
   );
 }
 
-class ReactRTC extends React.Component {
+class ReactRTC extends Component {
   constructor() {
     super();
     this.state = {
       sessionConstraints:{video:true, audio:false},
       localStream:null,
       localVideo:null,
-      remoteVideo:null
+      remoteVideo:null,
+      text: ''
     }
     // currently the url is hard-coded: need to change it to a variable for this.props.socketURL later
-    this.socketConnection = socketConnection('wss://0627a449.ngrok.io');
+    this.socketConnection = socketConnection('wss://94a57304.ngrok.io');
     this.iceServerConfig = {iceServers:[{ urls: 'stun:stun.l.google.com:19302' }]}
     this.peerConnection = new RTCPeerConnection(this.iceServerConfig);
 
@@ -52,6 +53,7 @@ class ReactRTC extends React.Component {
     // send the roomKey
     const roomKey = JSON.stringify({ roomKey: uuidGenerator() });
     this.socketConnection.send(roomKey);
+    alert(roomKey);
   }
 
   getUserMedia(event) {
@@ -89,7 +91,6 @@ class ReactRTC extends React.Component {
     console.log('hitting onTrackHandler')
     const remoteVideo = document.querySelector('#remoteVideo');
     remoteVideo.srcObject = new MediaStream([event.track]);
-    remoteVideo.style.display = 'block'
   }
 
   async onNegotiationNeededHandler(negotiationNeededEvent) {
@@ -120,8 +121,13 @@ class ReactRTC extends React.Component {
       console.log('event', event)
       const messageData = JSON.parse(event.data);
       console.log('messageData', messageData)
+      if (messageData.startConnection) {
+        console.log('Connection Started: ', messageData);
+        this.callButtonGetTracks();
+      } else {
         onMessage(messageData, this.peerConnection, this.socketConnection, this.state.sessionConstraints)
-      } 
+      }
+    } 
     this.socketConnection.onclose = (event) => {
       // console.log('Socket is closed. Reconnecting will be attempted in 1 second', event.reason);
       // setTimeout(()=>{
@@ -134,16 +140,36 @@ class ReactRTC extends React.Component {
       console.error('Socket encountered this error ==>', err.message, 'Closing socket');
     }
   }
-          
+
+  handleSubmit = (event) => {
+    event.preventDefault();
+    // send the roomKey
+    const roomKey = JSON.stringify({ roomKey: this.state.text });
+    this.socketConnection.send(roomKey);
+  }
+
+  handleChange = (event) => {
+    this.setState({
+      text: event.target.value
+    });
+  }
         
   render() {
     return (
       <div className='react-rtc'>
         <div className='videoContainer'>
-        <img className='react-rtc__logo' src={reactRTCLogo} alt=""/>
-        <video id='localVideo' autoPlay ></video>
-        <video id='remoteVideo' autoPlay ></video>
+          <img className='react-rtc__logo' src={reactRTCLogo} alt=""/>
+          <video id='localVideo' autoPlay ></video>
+          <video id='remoteVideo' autoPlay ></video>
         </div>
+
+        <form onSubmit={this.handleSubmit}>
+          <input 
+            type="text" 
+            onChange={this.handleChange}
+            value={this.state.text}/>
+          <input type="submit"/>
+        </form>
 
         <section className='button-container'>
           <div className='button button--start-color' onClick = {this.getUserMedia}>

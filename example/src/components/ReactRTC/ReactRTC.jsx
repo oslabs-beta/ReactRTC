@@ -29,19 +29,19 @@ class ReactRTC extends Component {
     }
     // currently the url is hard-coded: need to change it to a variable for this.props.socketURL later
     this.socketConnection = socketConnection('wss://94a57304.ngrok.io');
-    this.iceServerConfig = {iceServers:[{ urls: 'stun:stun.l.google.com:19302' }]}
+    this.iceServerConfig = {iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]}
     this.peerConnection = new RTCPeerConnection(this.iceServerConfig);
 
-    this.getUserMedia = this.getUserMedia.bind(this);
-    this.handleUserMedia = this.handleUserMedia.bind(this);
-    this.stopStream = this.stopStream.bind(this);
+    // this.getUserMedia = this.getUserMedia.bind(this);
+    // this.handleUserMedia = this.handleUserMedia.bind(this);
+    // this.stopStream = this.stopStream.bind(this);
     this.onIceHandler = this.onIceHandler.bind(this);
     this.onTrackHandler = this.onTrackHandler.bind(this);
     this.onNegotiationNeededHandler = this.onNegotiationNeededHandler.bind(this);
-    this.callButtonGetTracks = this.callButtonGetTracks.bind(this)
+    // this.callButtonGetTracks = this.callButtonGetTracks.bind(this)
   }
   
-  handleUserMedia(mediaStream) {
+  handleUserMedia = (mediaStream) => {
     const reactLogo = document.querySelector('.react-rtc__logo');
     reactLogo.style.display = 'none';
     this.setState({ localStream: mediaStream }, () => {
@@ -53,16 +53,16 @@ class ReactRTC extends Component {
     // send the roomKey
     const roomKey = JSON.stringify({ roomKey: uuidGenerator() });
     this.socketConnection.send(roomKey);
-    alert(roomKey);
+    alert(roomKey.roomKey);
   }
 
-  getUserMedia(event) {
+  getUserMedia = (event) => {
     navigator.mediaDevices.getUserMedia(this.state.sessionConstraints)
     .then(this.handleUserMedia)
     .catch((err) => { console.error('Err:'. err) })
   }
 
-  stopStream(event) {
+  stopStream = (event) => {
     const endVideoStream = this.state.localStream.getVideoTracks()[0].stop()
     // const endAudioStream = this.state.localStream.getAudioTracks()[0].stop()
     this.setState({ localStream: endVideoStream });
@@ -72,7 +72,7 @@ class ReactRTC extends Component {
     // this.setState({localStream:endAudioStream})
   }
 
-  async callButtonGetTracks() {
+  callButtonGetTracks = async () => {
     console.log('looking for localStream -->', this.state.localStream)
     await this.state.localStream.getTracks().forEach((mediaStreamTrack) => {
       console.log('hitting forEach getTracks')

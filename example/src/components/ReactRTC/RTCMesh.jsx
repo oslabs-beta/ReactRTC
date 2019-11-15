@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import RTCVideo from './RTCVideo.jsx';
 import Websocket from './Websocket.jsx';
 import { DEFAULT_CONSTRAINTS, DEFAULT_ICE_SERVERS, ROOM_TYPE } from './functions/constants';
-import { buildServers, roomKeyGenerator } from './functions/utils';
+import { buildServers, generateRoomKey } from './functions/utils';
 
 class RTCMesh extends Component {
   constructor(props) {
@@ -46,6 +46,19 @@ class RTCMesh extends Component {
     }
   }
 
+  handleOnIceEvent = (rtcPeerConnectionIceEvent) => {
+    if (rtcPeerConnectionIceEvent.candidate) {
+      const { sendMessage } = this.state;
+      const { type, candidate } = rtcPeerConnectionIceEvent;
+      sendMessage(JSON.stringify({ type, candidate}));
+    }
+  }
+
+  handleOnTrack = (trackEvent) => {
+    const remoteMediaStream = new MediaStream([ trackEvent.track ]);
+    this.setState({ remoteMediaStream });
+  }
+
   /**
    * @param {function} websocketSendMethod
    * upon successful creation of new Websocket instance, RTCMesh will recieve
@@ -74,6 +87,8 @@ class RTCMesh extends Component {
 
   componentDidMount() {
     this.rtcPeerConnection.onnegotiationneeded = this.handleOnNegotiationNeeded;
+    this.rtcPeerConnection.onicecandidate = this.handleOnIceEvent;
+    this.rtcPeerConnection.ontrack = this.handleOnTrack;
     this.openCamera();
   }
 

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import RTCVideo from './RTCVideo.jsx';
+import Form from './Form.jsx';
 import Websocket from './Websocket.jsx';
 import { DEFAULT_CONSTRAINTS, DEFAULT_ICE_SERVERS, ROOM_TYPE } from './functions/constants';
 import { buildServers, generateRoomKey } from './functions/utils';
@@ -15,6 +16,7 @@ class RTCMesh extends Component {
       mediaConstraints: mediaConstraints || DEFAULT_CONSTRAINTS,
       localMediaStream: null,
       remoteMediaStream: null,
+      roomKey: null,
       sendMessage: () => (console.log('websocket.send function has not been set')),
       text: '',
     };
@@ -25,12 +27,24 @@ class RTCMesh extends Component {
   }
 
   openCamera = async () => {
-    const { mediaConstraints } = this.state;
+    const { mediaConstraints, localMediaStream } = this.state;
     try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-      this.setState({ localMediaStream: mediaStream });
+      if (!localMediaStream) {
+        const mediaStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+        this.setState({ localMediaStream: mediaStream }, this.sendRoomKey);
+      }
     } catch(error) {
       console.error('getUserMedia Error: ', error)
+    }
+  }
+
+  sendRoomKey = () => {
+    const { roomKey } = this.state;
+    if (!roomKey) {
+      const room = { type: ROOM_TYPE, roomKey: generateRoomKey() };
+      this.setState({ roomKey: room })
+      this.state.sendMessage(JSON.stringify(room));
+      alert(room.roomKey);
     }
   }
 
@@ -71,12 +85,15 @@ class RTCMesh extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
+    const { text, roomKey } = this.state;
     // send the roomKey
-    const roomKey = JSON.stringify({
+    // if (roomKey && text.length )
+    const roomKeyMessage = JSON.stringify({
       type: ROOM_TYPE,
       roomKey: this.state.text
     });
-    this.state.sendMessage(roomKey);
+    this.state.sendMessage(roomKeyMessage);
+    this.setState({ text: '' });
   }
 
   handleChange = (event) => {
@@ -89,11 +106,10 @@ class RTCMesh extends Component {
     this.rtcPeerConnection.onnegotiationneeded = this.handleOnNegotiationNeeded;
     this.rtcPeerConnection.onicecandidate = this.handleOnIceEvent;
     this.rtcPeerConnection.ontrack = this.handleOnTrack;
-    this.openCamera();
   }
 
   render() {
-    const { localMediaStream, remoteMediaStream } = this.state;
+    const { localMediaStream, remoteMediaStream, text, roomKey } = this.state;
     return (
       <>
         <Websocket 
@@ -103,13 +119,19 @@ class RTCMesh extends Component {
         <RTCVideo mediaStream={localMediaStream} />
         <RTCVideo mediaStream={remoteMediaStream} />
 
-        <form onSubmit={this.handleSubmit}>
-          <input 
-            type="text" 
-            onChange={this.handleChange}
-            value={this.state.text}/>
-          <input type="submit"/>
-        </form>
+        <Form
+          handleSubmit={this.handleSubmit}
+          handleChange={this.handleChange}
+          hasRoomKey={roomKey}
+          text={text}
+        />
+
+        <section className='button-container'>
+          <div className='button button--start-color' onClick={this.openCamera}>
+          </div>
+          <div className='button button--stop-color' onClick={null}>
+          </div>
+        </section>
       </>
     );
   }

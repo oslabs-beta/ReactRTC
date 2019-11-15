@@ -61,6 +61,9 @@ wss.on('connection', (websocket, incomingMessage, req) => {
         roomChannels[roomKey] = [websocket];
         console.log('New room has been created with key: ', roomKey)
         console.log('Room Count: ', Object.keys(roomChannels).length);
+      } else {
+        const isFull = { isfull: true };
+        websocket.send(JSON.stringify(isFull));
       }
     } else {
       console.log('\nINSIDE SERVER VIDEO OFFER');

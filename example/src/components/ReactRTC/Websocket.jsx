@@ -12,6 +12,7 @@ class Websocket extends Component {
 
   setupConnection = () => {
     const { socket } = this.state;
+    const { setSendMethod } = this.props;
 
     socket.onopen = () => {
       console.log('Websocket connected');
@@ -28,6 +29,8 @@ class Websocket extends Component {
     socket.onerror = (error) => {
       console.error('Websocket error: ', error);
     }
+    // Saves websocket.send method definition inside RTCMesh's state
+    setSendMethod(socket.send);
   }
 
   componentDidMount() {

@@ -15,6 +15,7 @@ class RTCMesh extends Component {
       mediaConstraints: mediaConstraints || DEFAULT_CONSTRAINTS,
       localMediaStream: null,
       remoteMediaStream: null,
+      sendMessage: () => console.log('websocket.send function has not been set'),
       text: '',
     };
 
@@ -33,6 +34,26 @@ class RTCMesh extends Component {
     }
   }
 
+  handleOnNegotiationNeeded = async (negotiationNeededEvent) => {
+    console.log('Recieving negotiationNeededEvent: ', negotiationNeededEvent);
+    try {
+      const offer = await this.rtcPeerConnection.createOffer();
+      await this.rtcPeerConnection.setLocalDescription(offer);
+    } catch(error) {
+      console.error('handleNegotiationNeeded Error: ', error)
+    }
+  }
+
+  /**
+   * @param {function} websocketSendMethod
+   * upon successful creation of new Websocket instance, RTCMesh will recieve
+   * websocket's send function definition and store it in state
+   */
+  setSendMethod = (websocketSendMethod) => {
+    console.log ('Inside SocketCreation: ', websocketSendMethod);
+    this.setState({ sendMessage: websocketSendMethod });
+  }
+
   componentDidMount() {
     this.openCamera();
   }
@@ -41,7 +62,10 @@ class RTCMesh extends Component {
     const { localMediaStream, remoteMediaStream } = this.state;
     return (
       <>
-        <Websocket url="wss://94a57304.ngrok.io" />
+        <Websocket 
+          url="wss://94a57304.ngrok.io" 
+          setSendMethod={this.setSendMethod}
+        />
         <RTCVideo mediaStream={localMediaStream} />
         <RTCVideo mediaStream={remoteMediaStream} />
       </>

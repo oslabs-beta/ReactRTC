@@ -3,9 +3,10 @@ import React, { Component } from 'react';
 class Websocket extends Component {
   constructor(props) {
     super(props);
-    const { url } = props;
+    const { url } = this.props;
+    console.log('Websocket Props: ', url)
     this.state = {
-      socket: new Websocket(url),
+      socket: new WebSocket(url),
     };
   }
 

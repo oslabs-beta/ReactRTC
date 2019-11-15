@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import RTCVideo from './RTCVideo.jsx';
+import Websocket from './Websocket.jsx';
 import { DEFAULT_CONSTRAINTS, DEFAULT_ICE_SERVERS } from './functions/constants';
 import { buildServers, roomKeyGenerator } from './functions/utils';
 
@@ -26,6 +27,7 @@ class RTCMesh extends Component {
     const { localMediaStream, remoteMediaStream } = this.state;
     return (
       <>
+        <Websocket url="wss://94a57304.ngrok.io" />
         <RTCVideo mediaStream={localMediaStream} />
         <RTCVideo mediaStream={remoteMediaStream} />
       </>

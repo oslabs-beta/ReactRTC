@@ -1,21 +1,31 @@
-import React from 'react';
+import React, { PureComponent } from 'react';
 
-const RTCVideo = ({ mediaStream }) => {
-  console.log('mediaStream: ', mediaStream);
-  const addMediaStream = (video) => {
+class RTCVideo extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+
+  addMediaStream = (video) => {
+    const { mediaStream } = this.props;
     // Prevents throwing error upon a setState change when mediaStream is null
     if (mediaStream) video.srcObject = mediaStream;
-  };
+  }
+  
+  render() {
+    const { mediaStream } = this.props;
+    console.log('mediaStream: ', mediaStream);
 
-  return (
-    <video
-      className="rtc__video"
-      autoPlay
-      ref={addMediaStream}
-    >
-      <track default kind="captions" />
-    </video>
-  );
+    return (
+      <video
+        className="rtc__video"
+        style={{width: '480px', backgroundColor: 'black'}}
+        autoPlay
+        ref={mediaStream ? this.addMediaStream : null}
+      >
+        <track default kind="captions" />
+      </video>
+    );
+  }
 };
 
 export default RTCVideo;

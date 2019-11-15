@@ -29,8 +29,9 @@ class Websocket extends Component {
     socket.onerror = (error) => {
       console.error('Websocket error: ', error);
     }
+    // Binds send method to socket instance to not lose context
     // Saves websocket.send method definition inside RTCMesh's state
-    setSendMethod(socket.send);
+    setSendMethod(socket.send.bind(socket));
   }
 
   componentDidMount() {

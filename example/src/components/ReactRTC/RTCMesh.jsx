@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import RTCVideo from './RTCVideo.jsx';
 import Websocket from './Websocket.jsx';
-import { DEFAULT_CONSTRAINTS, DEFAULT_ICE_SERVERS } from './functions/constants';
+import { DEFAULT_CONSTRAINTS, DEFAULT_ICE_SERVERS, ROOM_TYPE } from './functions/constants';
 import { buildServers, roomKeyGenerator } from './functions/utils';
 
 class RTCMesh extends Component {
@@ -15,7 +15,7 @@ class RTCMesh extends Component {
       mediaConstraints: mediaConstraints || DEFAULT_CONSTRAINTS,
       localMediaStream: null,
       remoteMediaStream: null,
-      sendMessage: () => console.log('websocket.send function has not been set'),
+      sendMessage: () => (console.log('websocket.send function has not been set')),
       text: '',
     };
 
@@ -36,9 +36,11 @@ class RTCMesh extends Component {
 
   handleOnNegotiationNeeded = async (negotiationNeededEvent) => {
     console.log('Recieving negotiationNeededEvent: ', negotiationNeededEvent);
+    const { sendMessage } = this.state;
     try {
       const offer = await this.rtcPeerConnection.createOffer();
       await this.rtcPeerConnection.setLocalDescription(offer);
+      sendMessage(JSON.stringify(this.rtcPeerConnection.localDescription));
     } catch(error) {
       console.error('handleNegotiationNeeded Error: ', error)
     }
@@ -54,7 +56,24 @@ class RTCMesh extends Component {
     this.setState({ sendMessage: websocketSendMethod });
   }
 
+  handleSubmit = (event) => {
+    event.preventDefault();
+    // send the roomKey
+    const roomKey = JSON.stringify({
+      type: ROOM_TYPE,
+      roomKey: this.state.text
+    });
+    this.state.sendMessage(roomKey);
+  }
+
+  handleChange = (event) => {
+    this.setState({
+      text: event.target.value
+    });
+  }
+
   componentDidMount() {
+    this.rtcPeerConnection.onnegotiationneeded = this.handleOnNegotiationNeeded;
     this.openCamera();
   }
 
@@ -68,6 +87,14 @@ class RTCMesh extends Component {
         />
         <RTCVideo mediaStream={localMediaStream} />
         <RTCVideo mediaStream={remoteMediaStream} />
+
+        <form onSubmit={this.handleSubmit}>
+          <input 
+            type="text" 
+            onChange={this.handleChange}
+            value={this.state.text}/>
+          <input type="submit"/>
+        </form>
       </>
     );
   }

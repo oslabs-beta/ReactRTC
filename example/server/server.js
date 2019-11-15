@@ -52,7 +52,7 @@ wss.on('connection', (websocket, incomingMessage, req) => {
         // client joins the room
         roomChannels[roomKey].push(websocket);
         // set room ready object
-        const ready = {startConnection: true}
+        const ready = { type: 'CONNECTION', startConnection: true };
         // notify client that created the room to begin WebRTC Connection
         roomChannels[roomKey][0].send(JSON.stringify(ready));
       // if room doesn't exist

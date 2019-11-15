@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import RTCVideo from './RTCVideo.jsx';
 import Form from './Form.jsx';
 import Websocket from './Websocket.jsx';
-import { DEFAULT_CONSTRAINTS, DEFAULT_ICE_SERVERS, ROOM_TYPE } from './functions/constants';
+import PeerConnection from './PeerConnection.jsx';
+import { DEFAULT_CONSTRAINTS, DEFAULT_ICE_SERVERS, TYPE_ROOM } from './functions/constants';
 import { buildServers, generateRoomKey } from './functions/utils';
 
 class RTCMesh extends Component {
@@ -17,13 +18,10 @@ class RTCMesh extends Component {
       localMediaStream: null,
       remoteMediaStream: null,
       roomKey: null,
+      connectionStarted: false,
       sendMessage: () => (console.log('websocket.send function has not been set')),
       text: '',
     };
-
-    // eslint-disable-next-line react/destructuring-assignment
-    const iceServersFromState = this.state.iceServers;
-    this.rtcPeerConnection = new RTCPeerConnection({ iceServers: iceServersFromState });
   }
 
   openCamera = async () => {
@@ -38,41 +36,6 @@ class RTCMesh extends Component {
     }
   }
 
-  sendRoomKey = () => {
-    const { roomKey } = this.state;
-    if (!roomKey) {
-      const room = { type: ROOM_TYPE, roomKey: generateRoomKey() };
-      this.setState({ roomKey: room })
-      this.state.sendMessage(JSON.stringify(room));
-      alert(room.roomKey);
-    }
-  }
-
-  handleOnNegotiationNeeded = async (negotiationNeededEvent) => {
-    console.log('Recieving negotiationNeededEvent: ', negotiationNeededEvent);
-    const { sendMessage } = this.state;
-    try {
-      const offer = await this.rtcPeerConnection.createOffer();
-      await this.rtcPeerConnection.setLocalDescription(offer);
-      sendMessage(JSON.stringify(this.rtcPeerConnection.localDescription));
-    } catch(error) {
-      console.error('handleNegotiationNeeded Error: ', error)
-    }
-  }
-
-  handleOnIceEvent = (rtcPeerConnectionIceEvent) => {
-    if (rtcPeerConnectionIceEvent.candidate) {
-      const { sendMessage } = this.state;
-      const { type, candidate } = rtcPeerConnectionIceEvent;
-      sendMessage(JSON.stringify({ type, candidate}));
-    }
-  }
-
-  handleOnTrack = (trackEvent) => {
-    const remoteMediaStream = new MediaStream([ trackEvent.track ]);
-    this.setState({ remoteMediaStream });
-  }
-
   /**
    * @param {function} websocketSendMethod
    * upon successful creation of new Websocket instance, RTCMesh will recieve
@@ -83,16 +46,38 @@ class RTCMesh extends Component {
     this.setState({ sendMessage: websocketSendMethod });
   }
 
+  sendRoomKey = () => {
+    const { roomKey } = this.state;
+    if (!roomKey) {
+      const room = { type: TYPE_ROOM, roomKey: generateRoomKey() };
+      this.setState({ roomKey: room })
+      this.state.sendMessage(JSON.stringify(room));
+      alert(room.roomKey);
+    }
+  }
+
+  handleConnectionReady = (message) => {
+    console.log('Inside handleConnectionReady: ', message);
+    if (message.startConnection) {
+      this.setState({ connectionStarted: message.startConnection });
+    }
+  }
+
+  addRemoteStream = (remoteMediaStream) => {
+    this.setState({ remoteMediaStream });
+  }
+
   handleSubmit = (event) => {
     event.preventDefault();
     const { text, roomKey } = this.state;
     // send the roomKey
-    // if (roomKey && text.length )
-    const roomKeyMessage = JSON.stringify({
-      type: ROOM_TYPE,
-      roomKey: this.state.text
-    });
-    this.state.sendMessage(roomKeyMessage);
+    if (text.trim()) {
+      const roomKeyMessage = JSON.stringify({
+        type: TYPE_ROOM,
+        roomKey: this.state.text
+      });
+      this.state.sendMessage(roomKeyMessage);
+    };
     this.setState({ text: '' });
   }
 
@@ -102,19 +87,29 @@ class RTCMesh extends Component {
     });
   }
 
-  componentDidMount() {
-    this.rtcPeerConnection.onnegotiationneeded = this.handleOnNegotiationNeeded;
-    this.rtcPeerConnection.onicecandidate = this.handleOnIceEvent;
-    this.rtcPeerConnection.ontrack = this.handleOnTrack;
-  }
-
   render() {
-    const { localMediaStream, remoteMediaStream, text, roomKey } = this.state;
+    const { 
+      localMediaStream, 
+      remoteMediaStream, 
+      text, 
+      roomKey, 
+      iceServers,
+      connectionStarted,
+      sendMessage,
+    } = this.state;
     return (
       <>
         <Websocket 
           url="wss://94a57304.ngrok.io" 
           setSendMethod={this.setSendMethod}
+          handleConnectionReady={this.handleConnectionReady}
+        />
+        <PeerConnection
+          iceServers={iceServers}
+          localMediaStream={localMediaStream}
+          addRemoteStream={this.addRemoteStream}
+          startConnection={connectionStarted}
+          sendMessage={sendMessage}
         />
         <RTCVideo mediaStream={localMediaStream} />
         <RTCVideo mediaStream={remoteMediaStream} />

@@ -7,12 +7,12 @@ import { buildServers, roomKeyGenerator } from './functions/utils';
 class RTCMesh extends Component {
   constructor(props) {
     super(props);
-    const { sessionConstraints, iceServers } = props;
+    const {mediaConstraints, iceServers } = props;
     // build iceServers config for RTCPeerConnection
     const iceServerURLs = buildServers(iceServers);
     this.state = {
       iceServers: iceServerURLs || DEFAULT_ICE_SERVERS,
-      sessionConstraints: sessionConstraints || DEFAULT_CONSTRAINTS,
+      mediaConstraints: mediaConstraints || DEFAULT_CONSTRAINTS,
       localMediaStream: null,
       remoteMediaStream: null,
       text: '',
@@ -20,7 +20,21 @@ class RTCMesh extends Component {
 
     // eslint-disable-next-line react/destructuring-assignment
     const iceServersFromState = this.state.iceServers;
-    this.peerConnection = new RTCPeerConnection({ iceServers: iceServersFromState });
+    this.rtcPeerConnection = new RTCPeerConnection({ iceServers: iceServersFromState });
+  }
+
+  openCamera = async () => {
+    const { mediaConstraints } = this.state;
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+      this.setState({ localMediaStream: mediaStream });
+    } catch(error) {
+      console.error('getUserMedia Error: ', error)
+    }
+  }
+
+  componentDidMount() {
+    this.openCamera();
   }
 
   render() {

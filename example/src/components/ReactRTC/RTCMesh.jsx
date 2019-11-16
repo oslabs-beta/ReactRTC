@@ -4,7 +4,7 @@ import Form from './Form.jsx';
 import Websocket from './Websocket.jsx';
 import PeerConnection from './PeerConnection.jsx';
 import { DEFAULT_CONSTRAINTS, DEFAULT_ICE_SERVERS, TYPE_ROOM } from './functions/constants';
-import { buildServers, generateRoomKey } from './functions/utils';
+import { buildServers, generateRoomKey, createMessage, createPayload } from './functions/utils';
 
 class RTCMesh extends Component {
   constructor(props) {
@@ -18,6 +18,7 @@ class RTCMesh extends Component {
       localMediaStream: null,
       remoteMediaStream: null,
       roomKey: null,
+      socketID: null,
       connectionStarted: false,
       sendMessage: () => (console.log('websocket.send function has not been set')),
       text: '',
@@ -49,11 +50,16 @@ class RTCMesh extends Component {
   sendRoomKey = () => {
     const { roomKey } = this.state;
     if (!roomKey) {
-      const room = { type: TYPE_ROOM, roomKey: generateRoomKey() };
-      this.setState({ roomKey: room })
-      this.state.sendMessage(JSON.stringify(room));
-      alert(room.roomKey);
+      const key = generateRoomKey();
+      const roomData = createMessage(TYPE_ROOM, createPayload(key));
+      this.setState({ roomKey: key })
+      this.state.sendMessage(JSON.stringify(roomData));
+      alert(key);
     }
+  }
+
+  handleSocketConnection = (socketID) => {
+    this.setState({ socketID });
   }
 
   handleConnectionReady = (message) => {
@@ -69,14 +75,11 @@ class RTCMesh extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    const { text, roomKey } = this.state;
+    const { text } = this.state;
     // send the roomKey
     if (text.trim()) {
-      const roomKeyMessage = JSON.stringify({
-        type: TYPE_ROOM,
-        roomKey: this.state.text
-      });
-      this.state.sendMessage(roomKeyMessage);
+      const roomKeyMessage = createMessage(TYPE_ROOM, createPayload(text));
+      this.state.sendMessage(JSON.stringify(roomKeyMessage));
     };
     this.setState({ text: '' });
   }
@@ -102,6 +105,7 @@ class RTCMesh extends Component {
         <Websocket 
           url="wss://94a57304.ngrok.io" 
           setSendMethod={this.setSendMethod}
+          handleSocketConnection={this.handleSocketConnection}
           handleConnectionReady={this.handleConnectionReady}
         />
         <PeerConnection

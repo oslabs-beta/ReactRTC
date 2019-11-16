@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import { TYPE_CONNECTION, TYPE_OFFER, TYPE_ANSWER } from './functions/constants';
+import { TYPE_CONNECTION, TYPE_OFFER, TYPE_ANSWER, TYPE_NEW_USER } from './functions/constants';
 
 class Websocket extends Component {
   constructor(props) {
     super(props);
     const { url } = this.props;
-    console.log('Websocket Props: ', url)
     this.state = {
       socket: new WebSocket(url),
     };
@@ -13,7 +12,7 @@ class Websocket extends Component {
 
   setupConnection = () => {
     const { socket } = this.state;
-    const { setSendMethod, handleConnectionReady } = this.props;
+    const { setSendMethod, handleConnectionReady, handleSocketConnection } = this.props;
 
     socket.onopen = () => {
       console.log('Websocket connected');
@@ -23,6 +22,9 @@ class Websocket extends Component {
       console.log('Recieving Websocket message: ', message);
       const data = JSON.parse(message.data);
       switch(data.type) {
+        case TYPE_NEW_USER:
+          handleSocketConnection(data.id);
+          break;
         case TYPE_CONNECTION:
           handleConnectionReady(data);
           break;

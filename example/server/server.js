@@ -33,9 +33,42 @@ const server = https.createServer(
 
 // variable for websocket rooms
 let roomChannels = {};
+let userCount = 0;
 // WEBSOCKET SECURED CONNECTION //
 const wss = new WebSocket.Server({ server });
 // const wss = new WebSocket.Server({ port: PORT });
+
+wss.on('connection', (currentClient, incomingMessage) => {
+  const initialMessage = { type: 'NEW USER', id: userCount };
+  console.log('New Websocket Connection ID: ', userCount);
+  userCount += 1;
+  currentClient.send(JSON.stringify(initialMessage));
+
+  currentClient.on('message', (data) => {
+    console.log('\nDATA: ', data);
+    const parsedData = JSON.parse(data);
+    const { roomKey, message } = parsedData.payload;
+    // if room exist and room is full
+    if (roomChannels.hasOwnProperty(roomKey) && roomChannels[roomKey].length === 2) {
+
+    // if room exist and room is not full (max of 2 clients per room)
+    } else if (roomChannels.hasOwnProperty(roomKey) && roomChannels[roomKey].length < 2) {
+      console.log('New client has joined room ', roomKey);
+      // client joins the room
+      roomChannels[roomKey].push(currentClient);
+      // set room ready object
+      const ready = { type: 'CONNECTION', startConnection: true };
+      // notify client that created the room to begin WebRTC Connection
+      roomChannels[roomKey][0].send(JSON.stringify(ready));
+    // if room doesn't exist
+    } else if (!roomChannels.hasOwnProperty(roomKey)) {
+      // create new room & store current client in an array
+      roomChannels[roomKey] = [currentClient];
+      console.log('New room has been created with key: ', roomKey)
+      console.log('Room Count: ', Object.keys(roomChannels).length);
+    }
+  });
+});
 
 wss.on('connection', (websocket, incomingMessage, req) => {
   console.log('web socket fired up');
@@ -74,23 +107,6 @@ wss.on('connection', (websocket, incomingMessage, req) => {
           client.send(data);
       });
     }
-    // let roomAccessCode = data.roomAccessCode
-    // if(roomcode){
-    //   verified = true;
-    //   room = room_Channels[data.roomAccessCode];
-    //   if(!roomcode){
-    //     room_channels[key] = [websocket];
-    //     key = roomcode;
-    //   }
-    //   else{
-    //     room_Channels.push(websocket)
-    //   }
-    // }
-    // else{
-    //   console.log('room access code doesnt match')
-    // }
-    // console.log('this is the room object', room_Channels)
-
   });
 });
 

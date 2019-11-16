@@ -48,10 +48,10 @@ class RTCMesh extends Component {
   }
 
   sendRoomKey = () => {
-    const { roomKey } = this.state;
+    const { roomKey, socketID } = this.state;
     if (!roomKey) {
       const key = generateRoomKey();
-      const roomData = createMessage(TYPE_ROOM, createPayload(key));
+      const roomData = createMessage(TYPE_ROOM, createPayload(key, socketID));
       this.setState({ roomKey: key })
       this.state.sendMessage(JSON.stringify(roomData));
       alert(key);
@@ -75,10 +75,10 @@ class RTCMesh extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    const { text } = this.state;
+    const { text, socketID } = this.state;
     // send the roomKey
     if (text.trim()) {
-      const roomKeyMessage = createMessage(TYPE_ROOM, createPayload(text));
+      const roomKeyMessage = createMessage(TYPE_ROOM, createPayload(text, socketID));
       this.state.sendMessage(JSON.stringify(roomKeyMessage));
     };
     this.setState({ text: '' });
@@ -95,7 +95,8 @@ class RTCMesh extends Component {
       localMediaStream, 
       remoteMediaStream, 
       text, 
-      roomKey, 
+      roomKey,
+      socketID,
       iceServers,
       connectionStarted,
       sendMessage,
@@ -114,6 +115,7 @@ class RTCMesh extends Component {
           addRemoteStream={this.addRemoteStream}
           startConnection={connectionStarted}
           sendMessage={sendMessage}
+          roomInfo={{ socketID, roomKey }}
         />
         <RTCVideo mediaStream={localMediaStream} />
         <RTCVideo mediaStream={remoteMediaStream} />

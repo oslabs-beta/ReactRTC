@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { createMessage, createPayload } from './functions/utils';
+import { TYPE_OFFER, TYPE_ANSWER, TYPE_ICECANDIDATE } from './functions/constants';
 
 class PeerConnection extends Component {
   constructor(props) {
@@ -15,11 +17,13 @@ class PeerConnection extends Component {
 
   handleOnNegotiationNeeded = async (negotiationNeededEvent) => {
     console.log('Recieving negotiationNeededEvent: ', negotiationNeededEvent);
-    const { sendMessage } = this.props;
+    const { sendMessage, roomInfo } = this.props;
     try {
       const offer = await this.rtcPeerConnection.createOffer();
       await this.rtcPeerConnection.setLocalDescription(offer);
-      sendMessage(JSON.stringify(this.rtcPeerConnection.localDescription));
+      const payload = createPayload(roomInfo.roomKey, roomInfo.socketID, this.rtcPeerConnection.localDescription);
+      const offerMessage = createMessage(TYPE_OFFER, payload);
+      sendMessage(JSON.stringify(offerMessage));
     } catch(error) {
       console.error('handleNegotiationNeeded Error: ', error)
     }
@@ -27,9 +31,11 @@ class PeerConnection extends Component {
 
   handleOnIceEvent = (rtcPeerConnectionIceEvent) => {
     if (rtcPeerConnectionIceEvent.candidate) {
-      const { sendMessage } = this.props;
-      const { type, candidate } = rtcPeerConnectionIceEvent;
-      sendMessage(JSON.stringify({ type, candidate}));
+      const { sendMessage, roomInfo } = this.props;
+      const { candidate } = rtcPeerConnectionIceEvent;
+      const payload = createPayload(roomInfo.roomKey, roomInfo.socketID, candidate);
+      const iceCandidateMessage = createMessage(TYPE_ICECANDIDATE, payload);
+      sendMessage(JSON.stringify(iceCandidateMessage));
     }
   }
 

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TYPE_CONNECTION, TYPE_OFFER, TYPE_ANSWER, TYPE_NEW_USER } from './functions/constants';
+import { TYPE_CONNECTION, TYPE_OFFER, TYPE_ANSWER, TYPE_NEW_USER, TYPE_ICECANDIDATE } from './functions/constants';
 
 class Websocket extends Component {
   constructor(props) {
@@ -21,7 +21,7 @@ class Websocket extends Component {
     socket.onmessage = (message) => {
       console.log('Recieving Websocket message: ', message);
       const data = JSON.parse(message.data);
-      switch(data.type) {
+      switch (data.type) {
         case TYPE_NEW_USER:
           handleSocketConnection(data.id);
           break;
@@ -33,6 +33,9 @@ class Websocket extends Component {
           break;
         case TYPE_ANSWER:
           console.log('case Answer')
+          break;
+          case TYPE_ICECANDIDATE:
+            console.log('case Ice Candidate')
           break;
         default:
           console.error('Recieving message failed');

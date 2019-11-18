@@ -20,12 +20,12 @@ ReactRTC simplifies the implementation of WebRTC by providing developers with a 
 <br>
 <pre>npm install reactrtc</pre>
 
-<h2>Authorss</h2>
+<h2>Authors</h2>
 
+- Michael Romero
 - Joseph Wolensky
 - Diane Wu
 - Edwin Lin
-- Michael Romero
 
 <h2>Licenses</h2>
 

@@ -9,20 +9,24 @@ ReactRTC is a JS library that brings the real-time communication capabilities of
 
 ReactRTC simplifies the implementation of WebRTC by providing developers with a customizable react component and signalling server module for the back-end.
 
-<h2>Features:</h2>
+<h2>Features</h2>
 
 - Live video & audio streaming capabilities. 
 - GUI interface providing key user functionality.
 - Signalling server module utilizing websockets.
 - Multi-user support through the implementation of server side rooms.
 
-Authors:
+<h2>Installing</h2>
+<br>
+<pre>npm install reactrtc</pre>
+
+<h2>Authorss</h2>
 
 - Joseph Wolensky
 - Diane Wu
 - Edwin Lin
 - Michael Romero
 
-License:
+<h2>Licenses</h2>
 
 This project is licensed under the MIT License - see the LICENSE file for details

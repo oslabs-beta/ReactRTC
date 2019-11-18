@@ -13,6 +13,6 @@ Features:
 - Live video & audio streaming capabilities. 
 - GUI interface providing key user functionality.
 - Signalling server module utilizing websockets.
-- Room support providing multi-user connection capability.
+- Multi-user support through the implementation of server side rooms.
 
 

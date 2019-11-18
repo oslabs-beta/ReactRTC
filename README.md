@@ -1,6 +1,7 @@
 <div align="center">
   <img src="https://github.com/oslabs-beta/ReactRTC/blob/master/ReactRTC2.png" alt="ReactRTC" width="400"></a>
   <br>
+  <br>
 </div>
 
 

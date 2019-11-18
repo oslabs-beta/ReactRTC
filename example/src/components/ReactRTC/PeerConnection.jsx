@@ -5,23 +5,25 @@ import { TYPE_OFFER, TYPE_ANSWER, TYPE_ICECANDIDATE } from './functions/constant
 class PeerConnection extends Component {
   constructor(props) {
     super(props)
-    this.rtcPeerConnection = new RTCPeerConnection({ iceServers: props.iceServers });
+    // this.rtcPeerConnection = new RTCPeerConnection({ iceServers: props.iceServers });
   }
 
   addMediaStreamTrack = async () => {
-    const { localMediaStream } = this.props
-    await localMediaStream.getTracks().forEach((mediaStreamTrack) => {
-      this.rtcPeerConnection.addTrack(mediaStreamTrack);
-    });
+    const { localMediaStream, rtcPeerConnection } = this.props
+    console.log('addMediaStream: ', localMediaStream);
+    if (localMediaStream) {
+      await localMediaStream.getTracks().forEach((mediaStreamTrack) => {
+        rtcPeerConnection.addTrack(mediaStreamTrack);
+      });
+    }
   }
 
   handleOnNegotiationNeeded = async (negotiationNeededEvent) => {
-    console.log('Recieving negotiationNeededEvent: ', negotiationNeededEvent);
-    const { sendMessage, roomInfo } = this.props;
+    const { sendMessage, roomInfo, rtcPeerConnection } = this.props;
     try {
-      const offer = await this.rtcPeerConnection.createOffer();
-      await this.rtcPeerConnection.setLocalDescription(offer);
-      const payload = createPayload(roomInfo.roomKey, roomInfo.socketID, this.rtcPeerConnection.localDescription);
+      const offer = await rtcPeerConnection.createOffer();
+      await rtcPeerConnection.setLocalDescription(offer);
+      const payload = createPayload(roomInfo.roomKey, roomInfo.socketID, rtcPeerConnection.localDescription);
       const offerMessage = createMessage(TYPE_OFFER, payload);
       sendMessage(JSON.stringify(offerMessage));
     } catch(error) {
@@ -33,7 +35,7 @@ class PeerConnection extends Component {
     if (rtcPeerConnectionIceEvent.candidate) {
       const { sendMessage, roomInfo } = this.props;
       const { candidate } = rtcPeerConnectionIceEvent;
-      const payload = createPayload(roomInfo.roomKey, roomInfo.socketID, candidate);
+      const payload = createPayload(roomInfo.roomKey, roomInfo.socketID, JSON.stringify(candidate));
       const iceCandidateMessage = createMessage(TYPE_ICECANDIDATE, payload);
       sendMessage(JSON.stringify(iceCandidateMessage));
     }
@@ -45,9 +47,11 @@ class PeerConnection extends Component {
   }
 
   componentDidMount() {
-    this.rtcPeerConnection.onnegotiationneeded = this.handleOnNegotiationNeeded;
-    this.rtcPeerConnection.onicecandidate = this.handleOnIceEvent;
-    this.rtcPeerConnection.ontrack = this.handleOnTrack;
+    const { handlePeerConnection, rtcPeerConnection } = this.props;
+    rtcPeerConnection.onnegotiationneeded = this.handleOnNegotiationNeeded;
+    rtcPeerConnection.onicecandidate = this.handleOnIceEvent;
+    rtcPeerConnection.ontrack = this.handleOnTrack;
+    // handlePeerConnection(this.rtcPeerConnection);
   }
 
   componentDidUpdate(prevProps) {

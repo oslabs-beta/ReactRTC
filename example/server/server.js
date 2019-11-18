@@ -75,7 +75,8 @@ wss.on('connection', (currentClient, incomingMessage) => {
       default:
         if (parsedData) {
           const clients = roomChannels[roomKey];
-          Object.keys(clients).forEach((client) => {
+          Object.keys(clients).forEach((id) => {
+            const client = clients[id];
             if (client !== currentClient && client.readyState === WebSocket.OPEN) client.send(data);
           });
         }

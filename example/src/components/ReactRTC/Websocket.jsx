@@ -4,15 +4,18 @@ import { TYPE_CONNECTION, TYPE_OFFER, TYPE_ANSWER, TYPE_NEW_USER, TYPE_ICECANDID
 class Websocket extends Component {
   constructor(props) {
     super(props);
-    const { url } = this.props;
-    this.state = {
-      socket: new WebSocket(url),
-    };
   }
 
   setupConnection = () => {
-    const { socket } = this.state;
-    const { setSendMethod, handleConnectionReady, handleSocketConnection } = this.props;
+    const {
+      socket,
+      setSendMethod,
+      handleConnectionReady,
+      handleSocketConnection,
+      handleOffer,
+      handleAnswer,
+      handleIceCandidate,
+    } = this.props;
 
     socket.onopen = () => {
       console.log('Websocket connected');
@@ -30,12 +33,15 @@ class Websocket extends Component {
           break;
         case TYPE_OFFER:
           console.log('case Offer')
+          handleOffer(data);
           break;
         case TYPE_ANSWER:
           console.log('case Answer')
+          handleAnswer(data);
           break;
           case TYPE_ICECANDIDATE:
             console.log('case Ice Candidate')
+            handleIceCandidate(data);
           break;
         default:
           console.error('Recieving message failed');

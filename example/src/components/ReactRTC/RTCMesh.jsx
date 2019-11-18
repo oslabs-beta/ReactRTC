@@ -3,7 +3,7 @@ import RTCVideo from './RTCVideo.jsx';
 import Form from './Form.jsx';
 import Websocket from './Websocket.jsx';
 import PeerConnection from './PeerConnection.jsx';
-import { DEFAULT_CONSTRAINTS, DEFAULT_ICE_SERVERS, TYPE_ROOM } from './functions/constants';
+import { DEFAULT_CONSTRAINTS, DEFAULT_ICE_SERVERS, TYPE_ROOM, TYPE_OFFER, TYPE_ANSWER } from './functions/constants';
 import { buildServers, generateRoomKey, createMessage, createPayload } from './functions/utils';
 
 class RTCMesh extends Component {
@@ -23,18 +23,87 @@ class RTCMesh extends Component {
       sendMessage: () => (console.log('websocket.send function has not been set')),
       text: '',
     };
+    this.socket = new WebSocket('wss://94a57304.ngrok.io');
+    this.rtcPeerConnection = new RTCPeerConnection({ iceServers: this.state.iceServers });
   }
 
-  openCamera = async () => {
+  openCamera = () => {
     const { mediaConstraints, localMediaStream } = this.state;
-    try {
-      if (!localMediaStream) {
-        const mediaStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-        this.setState({ localMediaStream: mediaStream }, this.sendRoomKey);
-      }
-    } catch(error) {
-      console.error('getUserMedia Error: ', error)
+    if (!localMediaStream) {
+      navigator.mediaDevices.getUserMedia(mediaConstraints)
+        .then((mediaStream) => {
+          console.log('opening camera: ', mediaStream);
+          this.setState({ localMediaStream: mediaStream });
+        })
+        .catch((error) => {
+          console.error('getUserMedia Error: ', error);
+        });
     }
+  }
+  // openCamera = async () => {
+  //   const { mediaConstraints, localMediaStream } = this.state;
+  //   try {
+  //     if (!localMediaStream) {
+  //       const mediaStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+  //       console.log('opening camera: ', mediaStream);
+  //       this.setState({ localMediaStream: mediaStream }, this.sendRoomKey);
+  //     }
+  //   } catch(error) {
+  //     console.error('getUserMedia Error: ', error)
+  //   }
+  // }
+
+  // handleOffer = async (data) => {
+  //   const { localMediaStream, roomKey, socketID, sendMessage } = this.state;
+  //   const { payload } = data;
+  //   await this.rtcPeerConnection.setRemoteDescription(payload.message);
+  //   if (!localMediaStream) await this.openCamera();
+  //   this.setState({ connectionStarted: true }, async function() {
+  //     const answer = await this.rtcPeerConnection.createAnswer();
+  //     await this.rtcPeerConnection.setLocalDescription(answer);
+  //     const payload = createPayload(roomKey, socketID, answer);
+  //     const answerMessage = createMessage(TYPE_ANSWER, payload);
+  //     sendMessage(JSON.stringify(answerMessage));
+  //   });
+  // }
+  handleOffer = async (data) => {
+    const { localMediaStream, roomKey, socketID, sendMessage, mediaConstraints } = this.state;
+    const { payload } = data;
+    await this.rtcPeerConnection.setRemoteDescription(payload.message);
+    if (!localMediaStream) {
+      try {
+        const mediaStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+        console.log('opening camera: ', mediaStream);
+        this.setState({ localMediaStream: mediaStream, connectionStarted: true }, async function() {
+          const answer = await this.rtcPeerConnection.createAnswer();
+          await this.rtcPeerConnection.setLocalDescription(answer);
+          const payload = createPayload(roomKey, socketID, answer);
+          const answerMessage = createMessage(TYPE_ANSWER, payload);
+          sendMessage(JSON.stringify(answerMessage));
+        });
+      } catch(error) {
+        console.error('getUserMedia Error: ', error);
+      }
+    } else {
+      this.setState({ connectionStarted: true }, async function() {
+        const answer = await this.rtcPeerConnection.createAnswer();
+        await this.rtcPeerConnection.setLocalDescription(answer);
+        const payload = createPayload(roomKey, socketID, answer);
+        const answerMessage = createMessage(TYPE_ANSWER, payload);
+        sendMessage(JSON.stringify(answerMessage));
+      });
+    }
+  }
+
+  handleAnswer = async (data) => {
+    const { payload } = data;
+    await this.rtcPeerConnection.setRemoteDescription(payload.message);
+  }
+
+  handleIceCandidate = async (data) => {
+    const { message } = data.payload;
+    const candidate = JSON.parse(message);
+    await this.rtcPeerConnection.addIceCandidate(candidate);
   }
 
   /**
@@ -77,11 +146,12 @@ class RTCMesh extends Component {
     event.preventDefault();
     const { text, socketID } = this.state;
     // send the roomKey
+    // Remove leading and trailing whitespace
     if (text.trim()) {
       const roomKeyMessage = createMessage(TYPE_ROOM, createPayload(text, socketID));
       this.state.sendMessage(JSON.stringify(roomKeyMessage));
     };
-    this.setState({ text: '' });
+    this.setState({ text: '', roomKey: text.trim() });
   }
 
   handleChange = (event) => {
@@ -92,9 +162,9 @@ class RTCMesh extends Component {
 
   render() {
     const { 
-      localMediaStream, 
-      remoteMediaStream, 
-      text, 
+      localMediaStream,
+      remoteMediaStream,
+      text,
       roomKey,
       socketID,
       iceServers,
@@ -104,12 +174,17 @@ class RTCMesh extends Component {
     return (
       <>
         <Websocket 
-          url="wss://94a57304.ngrok.io" 
+          // url="wss://94a57304.ngrok.io"
+          socket={this.socket}
           setSendMethod={this.setSendMethod}
           handleSocketConnection={this.handleSocketConnection}
           handleConnectionReady={this.handleConnectionReady}
+          handleOffer={this.handleOffer}
+          handleAnswer={this.handleAnswer}
+          handleIceCandidate={this.handleIceCandidate}
         />
         <PeerConnection
+          rtcPeerConnection={this.rtcPeerConnection}
           iceServers={iceServers}
           localMediaStream={localMediaStream}
           addRemoteStream={this.addRemoteStream}

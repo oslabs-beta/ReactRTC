@@ -60,9 +60,16 @@ wss.on('connection', (currentClient, incomingMessage) => {
           // set room ready object
           const ready = { type: 'CONNECTION', startConnection: true };
           // notify client that created the room to begin WebRTC Connection
-          const clientID = Object.keys(roomChannels[roomKey])[0];
-          const remoteClient = roomChannels[roomKey][clientID];
-          remoteClient.send(JSON.stringify(ready));
+          // ! MIGHT REMOVE
+          // const clientID = Object.keys(roomChannels[roomKey])[0];
+          // const remoteClient = roomChannels[roomKey][clientID];
+          // remoteClient.send(JSON.stringify(ready));
+          // ! -------------------
+          const clients = roomChannels[roomKey];
+          Object.keys(clients).forEach((id) => {
+            const client = clients[id];
+            if (client !== currentClient && client.readyState === WebSocket.OPEN) client.send(JSON.stringify(ready));
+          });
         // if room doesn't exist
         } else if (!roomChannels.hasOwnProperty(roomKey)) {
           // create new room & store current client in an array

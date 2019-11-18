@@ -55,6 +55,7 @@ class PeerConnection extends Component {
   }
 
   componentDidUpdate(prevProps) {
+    console.log('ComponentDidUpdate | StartConnection: ', this.props.startConnection, ' | localMediaStream: ', this.props.localMediaStream)
     if (this.props.startConnection !== prevProps.startConnection) {
       this.addMediaStreamTrack();
     }

@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import { createMessage, createPayload } from './functions/utils';
-import { TYPE_OFFER, TYPE_ANSWER, TYPE_ICECANDIDATE } from './functions/constants';
+import { TYPE_OFFER, TYPE_ICECANDIDATE } from './functions/constants';
 
 class PeerConnection extends Component {
   constructor(props) {
     super(props)
-    // this.rtcPeerConnection = new RTCPeerConnection({ iceServers: props.iceServers });
   }
 
   addMediaStreamTrack = async () => {
@@ -47,15 +46,13 @@ class PeerConnection extends Component {
   }
 
   componentDidMount() {
-    const { handlePeerConnection, rtcPeerConnection } = this.props;
+    const { rtcPeerConnection } = this.props;
     rtcPeerConnection.onnegotiationneeded = this.handleOnNegotiationNeeded;
     rtcPeerConnection.onicecandidate = this.handleOnIceEvent;
     rtcPeerConnection.ontrack = this.handleOnTrack;
-    // handlePeerConnection(this.rtcPeerConnection);
   }
 
   componentDidUpdate(prevProps) {
-    console.log('ComponentDidUpdate | StartConnection: ', this.props.startConnection, ' | localMediaStream: ', this.props.localMediaStream)
     if (this.props.startConnection !== prevProps.startConnection) {
       this.addMediaStreamTrack();
     }

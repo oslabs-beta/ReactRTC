@@ -9,7 +9,6 @@ class Websocket extends Component {
   setupConnection = () => {
     const {
       socket,
-      setSendMethod,
       handleConnectionReady,
       handleSocketConnection,
       handleOffer,
@@ -39,9 +38,9 @@ class Websocket extends Component {
           console.log('case Answer')
           handleAnswer(data);
           break;
-          case TYPE_ICECANDIDATE:
-            console.log('case Ice Candidate')
-            handleIceCandidate(data);
+        case TYPE_ICECANDIDATE:
+          console.log('case Ice Candidate')
+          handleIceCandidate(data);
           break;
         default:
           console.error('Recieving message failed');
@@ -55,9 +54,6 @@ class Websocket extends Component {
     socket.onerror = (error) => {
       console.error('Websocket error: ', error);
     }
-    // Binds send method to socket instance to not lose context
-    // Saves websocket.send method definition inside RTCMesh's state
-    setSendMethod(socket.send.bind(socket));
   }
 
   componentDidMount() {

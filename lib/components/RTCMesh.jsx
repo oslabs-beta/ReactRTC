@@ -27,6 +27,7 @@ class RTCMesh extends Component {
   }
 
   openCamera = async (fromHandleOffer) => {
+    console.log('hitting openCamera')
     const { mediaConstraints, localMediaStream } = this.state;
     try {
       if (!localMediaStream) {

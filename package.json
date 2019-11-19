@@ -6,7 +6,7 @@
   "scripts": {
     "start": "webpack-dev-server --mode development --open",
     "build": "webpack --mode production",
-    "backend": "nodemon example/server/server.js",
+    "backend": "nodemon lib/server/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {

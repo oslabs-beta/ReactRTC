@@ -1,8 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import ReactRTC from './components/ReactRTC/ReactRTC.jsx';
 import RTCMesh from './components/ReactRTC/RTCMesh.jsx';
-
+import '@babel/polyfill'
 // const Index = () => (
 //   <div>
 //     {/* <ReactRTC /> */}

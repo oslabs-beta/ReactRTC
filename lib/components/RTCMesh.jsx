@@ -22,7 +22,7 @@ class RTCMesh extends Component {
       connectionStarted: false,
       text: '',
     };
-    this.socket = new WebSocket('wss://d150dc33.ngrok.io');
+    this.socket = new WebSocket('wss://0759e2a1.ngrok.io');
     this.rtcPeerConnection = new RTCPeerConnection({ iceServers: this.state.iceServers });
   }
 

@@ -1,0 +1,8 @@
+{
+ " jest":{
+  "setupFilesAfterEnv": [
+    "./jest.setup.js"
+  ]
+  }
+}
+

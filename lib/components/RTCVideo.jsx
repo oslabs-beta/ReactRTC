@@ -14,7 +14,7 @@ class RTCVideo extends PureComponent {
   
   render() {
     const { mediaStream } = this.props;
-    console.log('mediaStream: ', mediaStream);
+    // console.log('mediaStream: ', mediaStream);
 
     return (
       <video

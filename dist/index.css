@@ -1,0 +1,121 @@
+* {
+	box-sizing: border-box;
+	margin: 0;
+}
+
+body {
+	background-image: linear-gradient(rgba(100,202,117, 0.5), rgba(80,180,202, 0.5));
+	height: 100vh;
+}
+
+.react-rtc {
+	display: flex;
+	flex-direction: column;
+}
+
+.react-rtc__logo {
+	position: absolute;
+	top: 113px;
+	width: 200px;
+}
+
+/* -------------------------------------------- */
+
+.videoContainer {
+	align-items: center;
+	display:  flex;
+	flex-direction: column;
+	box-shadow: 10px 5px 5px #252525;
+	width: 480px;
+	margin: 48px auto;
+}
+
+#localVideo {
+	background-color: black;
+	/* background-color: slategrey; */
+	width: 480px;
+	border: 2px solid black;
+	/* border-bottom: 1px solid #252525; */
+}
+#remoteVideo {
+	/* display: none; */
+	width: 480px;
+	border: 2px solid black;
+	border-top: 1px solid #252525;
+	background-color: black;
+	/* background-color: slategrey; */
+}
+
+/* ------------------------------------------ */
+
+.button-container {
+	display: flex;
+	margin: 16px auto;
+	width: fit-content;
+	border: 2px solid black;
+	padding: 10px;
+	border-radius: 20px;
+}
+
+.button {
+	display: flex;
+	align-items: center;
+	/* border: 1px solid whitesmoke; */
+	/* background-image: linear-gradient(to right,rgb(100,202,117), rgb(80,180,202)); */
+	border-radius: 50%;
+	justify-content: center;
+	margin: 4px;
+	width: 72px;
+	height: 72px;
+	cursor: pointer;
+}
+	.button:active {
+		outline: rgb(80,180,202) solid 1px;
+	}
+	.button:hover {
+		background-image: none;
+		background-color: rgb(100,202,117);
+	}
+	.button:focus {
+		background-color: rgb(100,202,117);
+	}
+
+.button--stop-color {
+	background-color: red;
+}
+	.button--stop-color:hover {
+		background-color: red;
+		opacity: 0.75;
+	}
+	
+	.button--start-color {
+		background-color: rgb(100,202,117);
+	}
+		.button--start-color:hover {
+			opacity: 0.75;
+		}
+
+
+.icon {
+	width: 48px;
+	height: 48px;
+	background-position: center;
+	background-size: contain;
+}
+
+.icon--start {
+	/* background-image: url('https://github.com/oslabs-beta/ReactRTC/blob/diane_react/dist/assets/images/camera-icon.png'); */
+}
+
+.icon--stop {
+	width: 60px;
+	height: 60px;
+	/* background-image: url('https://github.com/oslabs-beta/ReactRTC/blob/diane_react/dist/assets/images/stop-icon.png'); */
+	/* opacity: 75%; */
+}
+
+.icon--call {
+	width: 46px;
+	height: 46px;
+	/* background-image: url('https://github.com/oslabs-beta/ReactRTC/blob/diane_react/dist/assets/images/phone-icon.png'); */
+}

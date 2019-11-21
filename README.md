@@ -21,9 +21,10 @@ ReactRTC simplifies the implementation of WebRTC by providing developers with a 
 <pre>npm install react-rtc-real</pre>
 <pre>npm install @babel/polyfill</pre>
 
-<pre>import RTCMesh from 'react-rtc-real';</pre>
-<pre>import '@babel/polyfill';</pre>
-<pre>require('react-rtc-real/assets/index.css');</pre>
+Import the following into the Top React Component (App)
+<pre>import RTCMesh from 'react-rtc-real';
+import '@babel/polyfill';</pre>
+require('react-rtc-real/assets/index.css');</pre>
 
 Add RTCMesh Child Component with URL prop set to Signal Server address like so:
 <pre>RTCMesh URL="wss://dacbab13.ngrok.io"</pre>

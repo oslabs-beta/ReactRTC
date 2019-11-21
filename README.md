@@ -18,7 +18,7 @@ ReactRTC simplifies the implementation of WebRTC by providing developers with a 
 
 <h2>Installing</h2>
 <br>
-<pre>npm install reactrtc-real</pre>
+<pre>npm install react-rtc-real</pre>
 
 <h2>Authors</h2>
 

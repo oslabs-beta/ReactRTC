@@ -1,0 +1,9 @@
+#localVideo {
+  width: 360px;
+  height: 720px; 
+  border: 1px solid green;
+}
+#remoteVideo {
+  width: 360px; 
+  border: 1px solid black;
+}

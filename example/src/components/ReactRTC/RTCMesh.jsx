@@ -9,7 +9,7 @@ import { buildServers, generateRoomKey, createMessage, createPayload } from './f
 class RTCMesh extends Component {
   constructor(props) {
     super(props);
-    const {mediaConstraints, iceServers } = props;
+    const {mediaConstraints, iceServers, URL } = props;
     // build iceServers config for RTCPeerConnection
     const iceServerURLs = buildServers(iceServers);
     this.state = {
@@ -20,10 +20,10 @@ class RTCMesh extends Component {
       roomKey: null,
       socketID: null,
       connectionStarted: false,
-      text: '',
+      text: ''
     };
     this.wantCamera = true;
-    this.socket = new WebSocket('wss://dacbab13.ngrok.io');
+    this.socket = new WebSocket(this.props.URL);
     this.rtcPeerConnection = new RTCPeerConnection({ iceServers: this.state.iceServers });
   }
 
@@ -83,7 +83,7 @@ class RTCMesh extends Component {
       transceiver['sender'].replaceTrack(screenStream)  
     }
   }
-
+  
   sendRoomKey = () => {
     const { roomKey, socketID } = this.state;
     if (!roomKey) {
@@ -173,7 +173,6 @@ class RTCMesh extends Component {
         <section className='button-container'>
           <div className='button button--start-color' onClick={this.openCamera}>
           </div>
-          <button onClick={this.handleShareDisplay}>Share Screen</button>
           <div className='button button--stop-color' onClick={null}>
           </div>
         </section>

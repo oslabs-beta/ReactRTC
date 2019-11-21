@@ -41,8 +41,11 @@ To set the URL of the signaling server pass the URL into props like so.
 *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
 
 To set up Signaling Server to find remote client, create a
-<pre> SignalServer.js </pre> file 
+SignalServer.js file and add the following:
 <pre> require('react-rtc-real/server/server.js'); </pre>
+
+Spin up the signaling server with the code in terminal:
+<pre> node SignalServer.js </pre>
 
 *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
 

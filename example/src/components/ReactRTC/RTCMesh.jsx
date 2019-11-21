@@ -9,7 +9,7 @@ import { buildServers, generateRoomKey, createMessage, createPayload } from './f
 class RTCMesh extends Component {
   constructor(props) {
     super(props);
-    const {mediaConstraints, iceServers, URL } = props;
+    const {mediaConstraints, iceServers } = props;
     // build iceServers config for RTCPeerConnection
     const iceServerURLs = buildServers(iceServers);
     this.state = {
@@ -20,9 +20,10 @@ class RTCMesh extends Component {
       roomKey: null,
       socketID: null,
       connectionStarted: false,
-      text: ''
+      text: '',
     };
-    this.socket = new WebSocket(this.props.URL);
+    this.wantCamera = true;
+    this.socket = new WebSocket('wss://dacbab13.ngrok.io');
     this.rtcPeerConnection = new RTCPeerConnection({ iceServers: this.state.iceServers });
   }
 
@@ -30,7 +31,10 @@ class RTCMesh extends Component {
     const { mediaConstraints, localMediaStream } = this.state;
     try {
       if (!localMediaStream) {
-        const mediaStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+        let mediaStream;
+        if(this.wantCamera) mediaStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+        else mediaStream = await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
+        
         return fromHandleOffer === true ? mediaStream : this.setState({ localMediaStream: mediaStream });
       }
     } catch(error) {
@@ -62,6 +66,22 @@ class RTCMesh extends Component {
     const { message } = data.payload;
     const candidate = JSON.parse(message);
     await this.rtcPeerConnection.addIceCandidate(candidate);
+  }
+
+  handleShareDisplay = async() => {
+    this.wantCamera = !this.wantCamera
+    if(this.state.connectionStarted){
+      const { mediaConstraints, localMediaStream } = this.state;
+      let mediaStream;
+      if(this.wantCamera) mediaStream = await navigator.mediaDevices.getUserMedia(mediaConstraints)
+      else mediaStream = await navigator.mediaDevices.getDisplayMedia(mediaConstraints)
+      
+      let screenStream = mediaStream.getVideoTracks()[0]
+      const transceiver = this.rtcPeerConnection.getTransceivers()[0]
+      localMediaStream.removeTrack(localMediaStream.getTracks()[0])
+      localMediaStream.addTrack(screenStream)
+      transceiver['sender'].replaceTrack(screenStream)  
+    }
   }
 
   sendRoomKey = () => {
@@ -153,6 +173,7 @@ class RTCMesh extends Component {
         <section className='button-container'>
           <div className='button button--start-color' onClick={this.openCamera}>
           </div>
+          <button onClick={this.handleShareDisplay}>Share Screen</button>
           <div className='button button--stop-color' onClick={null}>
           </div>
         </section>

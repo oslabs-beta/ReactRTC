@@ -19,7 +19,6 @@ ReactRTC simplifies the implementation of WebRTC by providing developers with a 
 <h2>Installing</h2>
 <br>
 <pre>npm install react-rtc-real</pre>
-<pre>npm install @babel/polyfill</pre>
 
 ReactRTC runs on React^16.11.0 and requires the following dependencies to operate. 
 
@@ -38,6 +37,14 @@ To set the URL of the signaling server pass the URL into props like so.
 <br>
 <br>
 `<RTCMesh URL=*url goes here* />`
+
+*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
+
+To set up Signaling Server to find remote client, create a
+<pre> SignalServer.js </pre> file 
+<pre> require('react-rtc-real/server/server.js'); </pre>
+
+*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
 
 <h2>Authors</h2>
 

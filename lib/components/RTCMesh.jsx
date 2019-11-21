@@ -9,7 +9,7 @@ import { buildServers, generateRoomKey, createMessage, createPayload } from '../
 class RTCMesh extends Component {
   constructor(props) {
     super(props);
-    const {mediaConstraints, iceServers } = props;
+    const {mediaConstraints, iceServers, URL } = props;
     // build iceServers config for RTCPeerConnection
     const iceServerURLs = buildServers(iceServers);
     this.state = {
@@ -22,7 +22,7 @@ class RTCMesh extends Component {
       connectionStarted: false,
       text: '',
     };
-    this.socket = new WebSocket('wss://0759e2a1.ngrok.io');
+    this.socket = new WebSocket(this.props.URL);
     this.rtcPeerConnection = new RTCPeerConnection({ iceServers: this.state.iceServers });
   }
 

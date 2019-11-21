@@ -23,13 +23,10 @@ ReactRTC simplifies the implementation of WebRTC by providing developers with a 
 
 ReactRTC runs on React^16.11.0 and requires the following dependencies to operate. 
 
-`npm install --save @babel/polyfill`
-<br>
-`npm install --save style-loader`
-<br>
-`npm install --save css-loader`
-<br>
-`npm install --save regenerator-runtime`
+<pre>npm install --save @babel/polyfill
+npm install --save style-loader
+npm install --save css-loader
+npm install --save regenerator-runtime</pre>
 
 Import the `<RTCMesh />` component into your React application to begin.
 <br>

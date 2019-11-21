@@ -5,7 +5,7 @@
 </div>
 
 
-ReactRTC is a JS library that brings the real-time communication capabilities of WebRTC into React applications. 
+ReactRTC-beta is a JS library that brings the real-time communication capabilities of WebRTC into React applications. 
 
 ReactRTC simplifies the implementation of WebRTC by providing developers with a customizable react component and signalling server module for the back-end.
 

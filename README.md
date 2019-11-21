@@ -27,7 +27,8 @@ import '@babel/polyfill';
 require('react-rtc-real/assets/index.css');</pre>
 
 To set the URL of the signaling server pass the URL into the props
-```<RTCMesh URL=*url goes here* />```
+<br>
+`<RTCMesh URL=*url goes here* />`
 
 <h2>Authors</h2>
 

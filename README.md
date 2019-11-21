@@ -47,7 +47,7 @@ SignalServer.js file and add the following:
 Spin up the signaling server with the code in terminal:
 <pre> node SignalServer.js </pre>
 
-Choose your preference for exposing a PORT for Signal Server.
+Choose your preferred tech for exposing a PORT for Signal Server.
 Using ngrok: https://ngrok.com/download
 Choose a PORT number to use and call in terminal (ie. 3000):
 <pre> ./ngrok http 3000 </pre>

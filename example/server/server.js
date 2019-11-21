@@ -1,6 +1,7 @@
 const path = require('path');
 const express = require('express');
 const https = require('http');
+
 const app = express();
 const WebSocket = require('ws');
 // const test = path.resolve(__dirname, '../client/index.js')
@@ -28,11 +29,11 @@ const server = https.createServer(
   //   // // otherwise you either get an error or a certified invalid warning
   //   cert: fs.readFileSync(path.resolve(__dirname, './ssl_diane/server.crt')),
   // },
-  app
+  app,
 );
 
 // variable for websocket rooms
-let roomChannels = {};
+const roomChannels = {};
 let userCount = 0;
 // WEBSOCKET SECURED CONNECTION //
 const wss = new WebSocket.Server({ server });

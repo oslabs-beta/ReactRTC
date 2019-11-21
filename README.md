@@ -26,8 +26,7 @@ Import the following into the Top React Component (App)
 import '@babel/polyfill';
 require('react-rtc-real/assets/index.css');</pre>
 
-Add RTCMesh Child Component with URL prop set to Signal Server address like so:
-<pre>RTCMesh URL="wss://dacbab13.ngrok.io"</pre>
+To set the URL of the signaling server pass into the props of <RTCMesh />  URL="*url goes here*" Example:
 
 <h2>Authors</h2>
 

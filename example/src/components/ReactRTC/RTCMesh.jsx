@@ -83,7 +83,7 @@ class RTCMesh extends Component {
       transceiver['sender'].replaceTrack(screenStream)  
     }
   }
-  
+
   sendRoomKey = () => {
     const { roomKey, socketID } = this.state;
     if (!roomKey) {
@@ -173,6 +173,7 @@ class RTCMesh extends Component {
         <section className='button-container'>
           <div className='button button--start-color' onClick={this.openCamera}>
           </div>
+          <button onClick={this.handleShareDisplay}>Share Screen</button>
           <div className='button button--stop-color' onClick={null}>
           </div>
         </section>

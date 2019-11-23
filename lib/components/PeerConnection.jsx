@@ -50,10 +50,14 @@ class PeerConnection extends Component {
       const { candidate } = rtcPeerConnectionIceEvent;
       const payload = createPayload(roomInfo.roomKey, roomInfo.socketID, JSON.stringify(candidate));
       const iceCandidateMessage = createMessage(TYPE_ICECANDIDATE, payload);
+      // sending an ice candidate to remote peer inside the same channel/room
       sendMessage(JSON.stringify(iceCandidateMessage));
     }
   }
 
+  /**
+   * @param {RTCTrackEvent} trackEvent
+   */
   handleOnTrack = (trackEvent) => {
     const remoteMediaStream = new MediaStream([ trackEvent.track ]);
     this.props.addRemoteStream(remoteMediaStream);

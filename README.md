@@ -78,6 +78,8 @@ Using LocalTunnel: <pre>npm install -g localtunnel</pre>
 *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
 
 <br>
+Demo
+<br>
 
 ![Use Gif](https://github.com/oslabs-beta/ReactRTC/blob/master/demo-use.gif?raw=true)
 

@@ -22,16 +22,22 @@ class RTCMesh extends Component {
       connectionStarted: false,
       text: '',
     };
-    this.socket = new WebSocket('wss://0759e2a1.ngrok.io');
+    this.socket = new WebSocket(this.props.URL);
     this.rtcPeerConnection = new RTCPeerConnection({ iceServers: this.state.iceServers });
   }
 
+  /**
+   * @param {Boolean} fromHandleOffer checks if its being invoked from #handleOffer or
+   * inside render.
+   */
   openCamera = async (fromHandleOffer) => {
     console.log('hitting openCamera')
     const { mediaConstraints, localMediaStream } = this.state;
     try {
       if (!localMediaStream) {
+        // asks permission to use camera/audio
         const mediaStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+        // returns a mediaStream or causes a re-render
         return fromHandleOffer === true ? mediaStream : this.setState({ localMediaStream: mediaStream });
       }
     } catch(error) {
@@ -39,10 +45,19 @@ class RTCMesh extends Component {
     }
   }
 
+  /**
+   * @param {Object} data contains an offer information that will be handled by a
+   * receiving Peer.
+   * 
+   * saves the offer, checks if camera needs to be opened, then creates an answer
+   * and sends it to a Peer.
+   */
   handleOffer = async (data) => {
     const { localMediaStream, roomKey, socketID } = this.state;
     const { payload } = data;
     await this.rtcPeerConnection.setRemoteDescription(payload.message);
+    // mediaStream will either be null if camera is off or a MediaStream instance if camera
+    // is on
     let mediaStream = localMediaStream
     if (!mediaStream) mediaStream = await this.openCamera(true);
     this.setState({ connectionStarted: true, localMediaStream: mediaStream }, async function() {
@@ -50,15 +65,29 @@ class RTCMesh extends Component {
       await this.rtcPeerConnection.setLocalDescription(answer);
       const payload = createPayload(roomKey, socketID, answer);
       const answerMessage = createMessage(TYPE_ANSWER, payload);
+      // sends an answer object to Peer who created an offer
       this.socket.send(JSON.stringify(answerMessage));
     });
   }
 
+  /**
+   * @param {Object} data contains an answer information that will be handled by a
+   * receiving Peer.
+   * 
+   * after having sent an offer, will recieve an answer from remote peer and save
+   * it.
+   */
   handleAnswer = async (data) => {
     const { payload } = data;
     await this.rtcPeerConnection.setRemoteDescription(payload.message);
   }
 
+  /**
+   * @param {Object} data contains ice candidate information.
+   * 
+   * ice candidates will be used to know the best connection possible to communicate
+   * with a remote peer.
+   */
   handleIceCandidate = async (data) => {
     const { message } = data.payload;
     const candidate = JSON.parse(message);

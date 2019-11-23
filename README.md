@@ -70,13 +70,17 @@ Using LocalTunnel: <pre>npm install -g localtunnel</pre>
 <pre>lt --port 3000 --subdomain chooseUniqueName</pre>
 
 <br>
+
 ![Signal Demo](https://github.com/oslabs-beta/ReactRTC/blob/master/Demo-signal.png?raw=true)
+
 <br>
 <br>
 *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
 
 <br>
+
 ![Use Gif](https://github.com/oslabs-beta/ReactRTC/blob/master/demo-use.gif?raw=true)
+
 <br>
 <br>
 *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*

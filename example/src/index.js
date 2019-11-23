@@ -9,4 +9,4 @@ import '@babel/polyfill';
 //   </div>
 // );
 
-ReactDOM.render(<RTCMesh URL="wss://dacbab13.ngrok.io" />, document.getElementById('root'));
+ReactDOM.render(<RTCMesh URL="wss://89440dc0.ngrok.io" />, document.getElementById('root'));

@@ -38,7 +38,10 @@ To set the URL of the signaling server pass the URL into props like so.
 `<RTCMesh URL=*url goes here* />`
 
 URL must be a websocket, pre-pended with wss://
-
+<br>
+![Import Demo](https://github.com/oslabs-beta/ReactRTC/blob/master/Demo-import.png?raw=true)
+<br>
+<br>
 *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
 
 To set up Signaling Server to find remote client, import to your server.js file.
@@ -66,13 +69,15 @@ Use the same PORT number and call in terminal (ie. 3000):
 Using LocalTunnel: <pre>npm install -g localtunnel</pre>
 <pre>lt --port 3000 --subdomain chooseUniqueName</pre>
 
-*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
-
-![Import Demo](https://github.com/oslabs-beta/ReactRTC/blob/master/Demo-import.png?raw=true)
 <br>
 ![Signal Demo](https://github.com/oslabs-beta/ReactRTC/blob/master/Demo-signal.png?raw=true)
 <br>
+<br>
+*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
+
+<br>
 ![Use Gif](https://github.com/oslabs-beta/ReactRTC/blob/master/demo-use.gif?raw=true)
+<br>
 <br>
 *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
 

@@ -69,6 +69,7 @@ class PeerConnection extends Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.startConnection !== prevProps.startConnection) {
+      // only gets invoked when a user has joined the existing channel/room
       this.addMediaStreamTrack();
     }
   }

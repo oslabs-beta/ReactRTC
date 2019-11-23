@@ -94,21 +94,20 @@ class RTCMesh extends Component {
     await this.rtcPeerConnection.addIceCandidate(candidate);
   }
 
-  sendRoomKey = () => {
-    const { roomKey, socketID } = this.state;
-    if (!roomKey) {
-      const key = generateRoomKey();
-      const roomData = createMessage(TYPE_ROOM, createPayload(key, socketID));
-      this.setState({ roomKey: key })
-      this.socket.send(JSON.stringify(roomData));
-      alert(key);
-    }
-  }
-
+  /**
+   * @param {Integer} socketID
+   */
   handleSocketConnection = (socketID) => {
     this.setState({ socketID });
   }
 
+  /**
+   * @param {Object} message contains a boolean to notify Peer to begin communicating
+   * 
+   * when a channel/room is successfully full, server will send a start connection
+   * object that will begin an offer, answer and ice candidate exchanges between 
+   * RTCPeerConnections
+   */
   handleConnectionReady = (message) => {
     console.log('Inside handleConnectionReady: ', message);
     if (message.startConnection) {
@@ -116,10 +115,18 @@ class RTCMesh extends Component {
     }
   }
 
+  /**
+   * @param {MediaStream} remoteMediaStream used to display a remote peer
+   */
   addRemoteStream = (remoteMediaStream) => {
     this.setState({ remoteMediaStream });
   }
 
+  /**
+   * @param {SyntheticEvent} event
+   * 
+   * will submit to server to create or join a channel/room
+   */
   handleSubmit = (event) => {
     event.preventDefault();
     const { text, socketID } = this.state;

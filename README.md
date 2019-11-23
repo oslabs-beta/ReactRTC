@@ -69,9 +69,11 @@ Using LocalTunnel: <pre>npm install -g localtunnel</pre>
 *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
 
 ![Import Demo](https://github.com/oslabs-beta/ReactRTC/blob/master/Demo-import.png?raw=true)
-
-
-
+<br>
+![Signal Demo](https://github.com/oslabs-beta/ReactRTC/blob/master/Demo-signal.png?raw=true)
+<br>
+![Use Gif](https://github.com/oslabs-beta/ReactRTC/blob/master/demo-use.gif?raw=true)
+<br>
 *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
 
 <h2>Authors</h2>

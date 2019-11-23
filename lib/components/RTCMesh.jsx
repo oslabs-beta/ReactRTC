@@ -102,11 +102,11 @@ class RTCMesh extends Component {
   }
 
   /**
-   * @param {Object} message contains a boolean to notify Peer to begin communicating
+   * @param {Object} message contains a boolean to notify Peer to begin communicating.
    * 
    * when a channel/room is successfully full, server will send a start connection
    * object that will begin an offer, answer and ice candidate exchanges between 
-   * RTCPeerConnections
+   * RTCPeerConnections.
    */
   handleConnectionReady = (message) => {
     console.log('Inside handleConnectionReady: ', message);
@@ -116,7 +116,7 @@ class RTCMesh extends Component {
   }
 
   /**
-   * @param {MediaStream} remoteMediaStream used to display a remote peer
+   * @param {MediaStream} remoteMediaStream used to display a remote peer.
    */
   addRemoteStream = (remoteMediaStream) => {
     this.setState({ remoteMediaStream });
@@ -125,7 +125,7 @@ class RTCMesh extends Component {
   /**
    * @param {SyntheticEvent} event
    * 
-   * will submit to server to create or join a channel/room
+   * will submit to server to create or join a channel/room.
    */
   handleSubmit = (event) => {
     event.preventDefault();

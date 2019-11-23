@@ -68,6 +68,12 @@ Using LocalTunnel: <pre>npm install -g localtunnel</pre>
 
 *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
 
+![Image description] https://github.com/oslabs-beta/ReactRTC/blob/master/Demo-import.png?raw=true
+
+
+
+*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
+
 <h2>Authors</h2>
 
 - Michael Romero

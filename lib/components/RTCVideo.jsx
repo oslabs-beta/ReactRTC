@@ -5,6 +5,9 @@ class RTCVideo extends PureComponent {
     super(props)
   }
 
+  /**
+   * @param {<video>} video is an HTML element
+   */
   addMediaStream = (video) => {
     const { mediaStream } = this.props;
     // Prevents throwing error upon a setState change when mediaStream is null
@@ -14,7 +17,6 @@ class RTCVideo extends PureComponent {
   
   render() {
     const { mediaStream } = this.props;
-    // console.log('mediaStream: ', mediaStream);
 
     return (
       <video

@@ -35,25 +35,56 @@ require('react-rtc-real/assets/index.css');</pre>
 
 To set the URL of the signaling server pass the URL into props like so.
 <br>
-<br>
 `<RTCMesh URL=*url goes here* />`
 
+URL must be a websocket, pre-pended with wss://
+<br>
+![Import Demo](https://github.com/oslabs-beta/ReactRTC/blob/master/Demo-import.png?raw=true)
+<br>
+<br>
 *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
 
-To set up Signaling Server to find remote client, create a
-SignalServer.js file and add the following:
-<pre> require('react-rtc-real/server/server.js'); </pre>
+To set up Signaling Server to find remote client, import to your server.js file.
+There should only be 3 lines of code added to your server.js file, numbered below.
+(assuming Node/Express is being used):
+<pre>[1]: const SignalServer = require('react-rtc-real/server/SignalServer.js'); </pre>
 
-Spin up the signaling server with the code in terminal:
-<pre> node SignalServer.js </pre>
+Find your server instance, which will be invoking the http.createServer(), for example:
+<pre> const server = https.createServer(app); </pre>
+
+Create the Signal Server instance and connect to it:
+<pre>[2]: const signal = new SignalServer({ server });
+[3]: signal.connect(); </pre>
+
+Make sure your server instance is listening for the PORT number, like so:
+<pre>server.listen(3000, () => console.log('listening on 3000'));</pre>
 
 Choose your preferred tech for exposing a PORT for Signal Server.
 
 Using ngrok: https://ngrok.com/download
 
-Choose a PORT number to use and call in terminal (ie. 3000):
+Use the same PORT number and call in terminal (ie. 3000):
 <pre> ./ngrok http 3000 </pre>
 
+Using LocalTunnel: <pre>npm install -g localtunnel</pre>
+<pre>lt --port 3000 --subdomain chooseUniqueName</pre>
+
+<br>
+
+![Signal Demo](https://github.com/oslabs-beta/ReactRTC/blob/master/Demo-signal.png?raw=true)
+
+<br>
+<br>
+*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
+
+<br>
+Demo
+<br>
+
+![Use Gif](https://github.com/oslabs-beta/ReactRTC/blob/master/demo-use.gif?raw=true)
+
+<br>
+<br>
 *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
 
 <h2>Authors</h2>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TYPE_CONNECTION, TYPE_OFFER, TYPE_ANSWER, TYPE_NEW_USER, TYPE_ICECANDIDATE } from '../constants';
+import { TYPE_CONNECTION, TYPE_OFFER, TYPE_ANSWER, TYPE_NEW_USER, TYPE_ICECANDIDATE } from './functions/constants';
 
 class Websocket extends Component {
   constructor(props) {

@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github.com/oslabs-beta/ReactRTC/blob/master/ReactRTC2.png" alt="ReactRTC" width="400"></a>
+  <img src="https://github.com/oslabs-beta/ReactRTC/blob/master/project_assets/ReactRTC2.png" alt="ReactRTC" width="400"></a>
   <br>
   <br>
 </div>
@@ -22,15 +22,10 @@ ReactRTC simplifies the implementation of WebRTC by providing developers with a 
 
 ReactRTC runs on React^16.11.0 and requires the following dependencies to operate. 
 
-<pre>npm install --save @babel/polyfill
-npm install --save style-loader
-npm install --save css-loader
-npm install --save regenerator-runtime</pre>
-
 Import the `<RTCMesh />` component into your React application to begin.
 <br>
 <pre>import RTCMesh from 'react-rtc-real';
-import '@babel/polyfill';
+import '@core-js/stable';
 require('react-rtc-real/assets/index.css');</pre>
 
 To set the URL of the signaling server pass the URL into props like so.
@@ -39,7 +34,7 @@ To set the URL of the signaling server pass the URL into props like so.
 
 URL must be a websocket, pre-pended with wss://
 <br>
-![Import Demo](https://github.com/oslabs-beta/ReactRTC/blob/master/Demo-import.png?raw=true)
+![Import Demo](https://github.com/oslabs-beta/ReactRTC/blob/master/project_assets/Demo-import.png?raw=true)
 <br>
 <br>
 *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
@@ -71,7 +66,7 @@ Using LocalTunnel: <pre>npm install -g localtunnel</pre>
 
 <br>
 
-![Signal Demo](https://github.com/oslabs-beta/ReactRTC/blob/master/Demo-signal.png?raw=true)
+![Signal Demo](https://github.com/oslabs-beta/ReactRTC/blob/master/project_assets/Demo-signal.png?raw=true)
 
 <br>
 <br>
@@ -81,7 +76,7 @@ Using LocalTunnel: <pre>npm install -g localtunnel</pre>
 Demo
 <br>
 
-![Use Gif](https://github.com/oslabs-beta/ReactRTC/blob/master/demo-use.gif?raw=true)
+![Use Gif](https://github.com/oslabs-beta/ReactRTC/blob/master/project_assets/demo-use.gif?raw=true)
 
 <br>
 <br>

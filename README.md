@@ -25,7 +25,6 @@ ReactRTC runs on React^16.11.0 and requires the following dependencies to operat
 Import the `<RTCMesh />` component into your React application to begin.
 <br>
 <pre>import RTCMesh from 'react-rtc-real';
-import '@core-js/stable';
 require('react-rtc-real/assets/index.css');</pre>
 
 To set the URL of the signaling server pass the URL into props like so.
